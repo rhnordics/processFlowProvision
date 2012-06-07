@@ -12,55 +12,50 @@
     <!-- even though this is in build.xml ... need it here as well for distro -->
     <import file="privateServiceTaskRepo/build.xml"/>
 
-    <target name="stop.jboss" description="">
+    <target name="stop.jboss" >
         <fail unless="management.port" message="stop.jboss:  need to pass 'management.port' property" />
-        <fail unless="node.to.stop" message="stop.jboss:  need to pass 'node.to.stop' property" />
         <exec executable="bash" failonerror="true" dir="." >
            <arg value="bin/jboss_eap.sh"/>
            <arg value="stop"/>
            <arg value="${management.port}"/>
-           <arg value="${node.to.stop}"/>
         </exec>
     </target>
-    <target name="start.jboss" description="">
-        <fail unless="jboss.domain.base.dir" message="start.jboss:  need to pass 'jboss.domain.base.dir' property" />
-        <fail unless="domain.config.file" message="start.jboss:  need to pass 'domain.config.file' property" />
-        <exec executable="bash" failonerror="true" dir="." >
-           <arg value="bin/jboss_eap.sh"/>
-           <arg value="start"/>
-           <arg value="${jboss.domain.base.dir}"/>
-           <arg value="${domain.config.file}"/>
+    <target name="start.jboss" >
+        <fail unless="port.offset" message="start.jboss:  need to pass 'port.offset' property" />
+        <fail unless="new.server.configuration" message="start.jboss:  need to pass 'new.server.configuration' property" />
+        <fail unless="server.config.file.with.no.suffix" message="start.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
+        <exec executable="bin/jboss_eap.sh" failonerror="true" >
+            <arg value="start"/>
+            <arg value="${server.config.file.with.no.suffix}.xml"/>
+            <arg value="${new.server.configuration}"/>
+            <arg value="${port.offset}"/>
         </exec>
     </target>
     <target name="bounce.jboss" description="">
         <antcall target="stop.jboss" >
-            <param name="management.port" value="${management.port}"/>
-            <param name="node" value="master"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
         <antcall target="start.jboss" >
-            <param name="jboss.domain.base.dir" value="${jboss.domain.base.dir}"/>
-            <param name="server.config.file.with.no.suffix" value="${domain.config.file.with.no.suffix}"/>
+            <param name="port.offset" value="${pfp.core.port.offset}"/>
+            <param name="new.server.configuration" value="${jboss.server.configuration}"/>
+            <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
         </antcall>
     </target>
     <target name="refresh.jboss" >
-        <fail unless="node.to.stop" message="refresh.jboss:  need to pass 'node.to.stop' property" />
-        <fail unless="jboss.domain.base.dir" message="refresh.jboss:  need to pass 'jboss.domain.base.dir' property" />
-        <fail unless="domain.config.file" message="refresh.jboss:  need to pass 'domain.config.file' property" />
+        <fail unless="management.port" message="refresh.jboss:  need to pass 'management.port' property" />
+        <fail unless="port.offset" message="refresh.jboss:  need to pass 'port.offset' property" />
+        <fail unless="new.server.configuration" message="clone.jboss:  need to pass 'new.server.configuration' property" />
+        <fail unless="server.config.file.with.no.suffix" message="refresh.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
         <echo message="***** refresh.jboss :  will now call the following target :  stop.jboss, clone.jboss, and start.jboss" />
         <antcall target="stop.jboss" >
-            <param name="${node.to.stop}" value="${node.to.stop}"/>
+            <param name="management.port" value="${management.port}"/>
         </antcall>
         <antcall target="clone.jboss" >
-            <param name="jboss.domain.base.dir" value="${jboss.domain.base.dir}"/>
+            <param name="new.server.configuration" value="${new.server.configuration}"/>
         </antcall>
         <antcall target="start.jboss" >
-            <param name="jboss.domain.base.dir" value="${jboss.domain.base.dir}"/>
-            <param name="domain.config.file" value="${domain.config.file}"/>
-        </antcall>
-        <antcall target="execute.cli">
-                <param name="cli.source.dir" value="conf/jbossEAP/"/>
-                <param name="cli.to.filter.and.execute" value="jboss-config.cli"/>
-                <param name="management.port" value="${management.port}"/>
+            <param name="port.offset" value="${port.offset}"/>
+            <param name="new.server.configuration" value="${new.server.configuration}"/>
         </antcall>
     </target>
     <target name="checkServersAndProjectLib">
@@ -76,18 +71,13 @@
         </condition>
     </target>
 
-    <!-- create a clone of the JBoss EAP 'domain' config and name it the value of ${jboss.domain.base.dir} -->
+    <!-- create a clone of the JBoss EAP 'standalone' config and name it the value of ${jboss.server.configuration} -->
     <target name="clone.jboss" >
-        <fail unless="jboss.domain.base.dir" message="clone.jboss:  need to pass 'jboss.domain.base.dir' property" />
-        <delete dir="${jboss.home}/${jboss.domain.base.dir}" />
-        <copy overwrite="true" todir="${jboss.home}/${jboss.domain.base.dir}">
-            <fileset dir="${jboss.home}/domain" />
+        <fail unless="new.server.configuration" message="clone.jboss:  need to pass 'new.server.configuration' property" />
+        <delete dir="${jboss.home}/${new.server.configuration}" />
+        <copy overwrite="true" todir="${jboss.home}/${new.server.configuration}">
+            <fileset dir="${jboss.home}/standalone" />
         </copy>
-        <antcall target="filter">
-            <param name="source.dir" value="conf/jbossEAP"/>
-            <param name="file.name" value="domain.xml"/>
-            <param name="dest.dir" value="${jboss.home}/${jboss.domain.base.dir}/configuration"/>
-        </antcall>
     </target>
 
     <!--
@@ -114,7 +104,7 @@
             <not><isset property="cli.fail.on.error"/></not>
             <then><property name="cli.fail.on.error" value="true" /></then>
         </if>
-        <echo message="***** execute.cli :  about to execute following batch script = ${build.dir}/${cli.to.filter.and.execute} : cli.fail.on.error = ${cli.fail.on.error}" />
+        <echo message="***** execute.cli :  about to execute following batch script = ${temp.dir}/${cli.to.filter.and.execute} : cli.fail.on.error = ${cli.fail.on.error}" />
         <exec executable="${jboss.home}/bin/jboss-cli.sh" failonerror="${cli.fail.on.error}">
             <arg value="--connect"/>
             <arg value="--controller=${ENV.HOSTNAME}:${management.port}"/>
@@ -178,15 +168,8 @@
     <target name="hornetq-config" if="useHornetQ" >
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/hornetq/"/>
-            <param name="cli.to.filter.and.execute" value="hornetq-config-down.cli"/>
-            <param name="management.port" value="${management.port}"/>
-            <param name="cli.fail.on.error" value="false"/>
-        </antcall>
-        <antcall target="execute.cli">
-            <param name="cli.source.dir" value="conf/hornetq/"/>
-            <param name="cli.to.filter.and.execute" value="hornetq-config-up.cli"/>
-            <param name="management.port" value="${management.port}"/>
-            <param name="cli.fail.on.error" value="true"/>
+            <param name="cli.to.filter.and.execute" value="hornetq-config.cli"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
     </target>
 
@@ -197,7 +180,7 @@
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/qpid"/>
             <param name="cli.to.filter.and.execute" value="qpid-config.cli"/>
-            <param name="management.port" value="${management.port}"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
     </target>
 
@@ -208,14 +191,8 @@
         <jar jarfile="${temp.dir}/${pfp.ear.name}" basedir="${temp.ear.dir}" />
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/pfp"/>
-            <param name="cli.to.filter.and.execute" value="pfp-config-down.cli"/>
-            <param name="management.port" value="${management.port}"/>
-            <param name="cli.fail.on.error" value="false"/>
-        </antcall>
-        <antcall target="execute.cli">
-            <param name="cli.source.dir" value="conf/pfp"/>
             <param name="cli.to.filter.and.execute" value="pfp-config-up.cli"/>
-            <param name="management.port" value="${management.port}"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
             <param name="cli.fail.on.error" value="true"/>
         </antcall>
     </target>
@@ -491,9 +468,10 @@
             <equals arg1="${refresh.jboss}" arg2="true" />
             <then>
                 <antcall target="refresh.jboss" >
-                    <param name="node.to.stop" value="master"/>
-                    <param name="jboss.domain.base.dir" value="${jboss.domain.base.dir}"/>
-                    <param name="domain.config.file" value="${domain.config.file}"/>
+                    <param name="management.port" value="${pfp.core.management.port}"/>
+                    <param name="port.offset" value="${pfp.core.port.offset}"/>
+                    <param name="new.server.configuration" value="${jboss.server.configuration}"/>
+                    <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
                 </antcall>
             </then>
         </if>
