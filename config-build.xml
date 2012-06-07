@@ -489,9 +489,10 @@
             <equals arg1="${refresh.jboss}" arg2="true" />
             <then>
                 <antcall target="refresh.jboss" >
-                    <param name="node.to.stop" value="master"/>
-                    <param name="jboss.domain.base.dir" value="${jboss.domain.base.dir}"/>
-                    <param name="domain.config.file" value="${domain.config.file}"/>
+                    <param name="management.port" value="${brms.webs.management.port}"/>
+                    <param name="port.offset" value="${brms.webs.port.offset}"/>
+                    <param name="new.server.configuration" value="${jboss.server.configuration}"/>
+                    <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
                 </antcall>
             </then>
         </if>
