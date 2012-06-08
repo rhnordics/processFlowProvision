@@ -55,8 +55,10 @@
         </antcall>
     </target>
     <target name="checkServersAndProjectLib">
-        <available file="${JBOSS_HOME}/jboss-modules.jar" property="defaultServerExists" />
-        <fail unless="defaultServerExists" message="${JBOSS_HOME}/jboss-modules.jar doesn't exist! .... please fix your $JBOSS_HOME environment variable!!" />
+        <available file="${jboss.home}/jboss-modules.jar" property="defaultServerExists" />
+        <fail unless="defaultServerExists" message="${jboss.home}/jboss-modules.jar doesn't exist! .... please fix your $JBOSS_HOME environment variable!!" />
+        <available file="${jboss.home}/standalone-orig/configuration/standalone.xml" property="standalone.orig.exists" />
+        <fail unless="defaultServerExists" message="${jboss.home}/standalone-orig/configuration/standalone.xml doesn't exist! " />
         <condition property="projectLibNotExist">
             <not>
                 <available file="${project.lib}" />
@@ -72,7 +74,7 @@
         <fail unless="new.server.configuration" message="clone.jboss:  need to pass 'new.server.configuration' property" />
         <delete dir="${jboss.home}/${new.server.configuration}" />
         <copy overwrite="true" todir="${jboss.home}/${new.server.configuration}">
-            <fileset dir="${jboss.home}/standalone" />
+            <fileset dir="${jboss.home}/standalone-orig" />
         </copy>
     </target>
 
@@ -450,6 +452,7 @@
 
     <target name="provision.pfp.core" description="">
         <fail unless="refresh.jboss" message="provision.pfp.core:  need to pass 'refresh.jboss' property" />
+        <antcall target="checkServersAndProjectLib" />
         <condition property="useBRMS">
             <not><isset property="upstream.jbpm5.drools.libs.type" /></not>
         </condition>
@@ -473,6 +476,7 @@
     </target>
     <target name="provision.brms.webs" description="" >
         <fail unless="refresh.jboss" message="provision.brms.webs:  need to pass 'refresh.jboss' property" />
+        <antcall target="checkServersAndProjectLib" />
         <if>
             <equals arg1="${refresh.jboss}" arg2="true" />
             <then>
