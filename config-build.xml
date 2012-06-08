@@ -8,10 +8,6 @@
     -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 
-
-    <!-- even though this is in build.xml ... need it here as well for distro -->
-    <import file="privateServiceTaskRepo/build.xml"/>
-
     <target name="stop.jboss" >
         <fail unless="management.port" message="stop.jboss:  need to pass 'management.port' property" />
         <exec executable="bash" failonerror="true" dir="." >
@@ -474,8 +470,6 @@
         <antcall target="hornetq-config" />
         <antcall target="pfp-config" />
         <antcall target="qpid-config" />
-        <antcall target="privateServiceTaskRepoDeploy" />
-        <antcall target="refreshGuvnor" />
     </target>
     <target name="provision.brms.webs" description="" >
         <fail unless="refresh.jboss" message="provision.brms.webs:  need to pass 'refresh.jboss' property" />
