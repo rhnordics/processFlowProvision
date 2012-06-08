@@ -138,10 +138,7 @@
         <antcall target="setClasspath" />
         <antcall target="interfaces" />
         <antcall target="common" />
-        <antcall target="bam" />
         <antcall target="knowledgeSessionService" />
-        <antcall target="taskService" />
-        <antcall target="adminConsole" />
         <antcall target="provision.brms.webs">
             <param name="refresh.jboss" value="true"/>
         </antcall>
