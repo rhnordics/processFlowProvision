@@ -146,7 +146,7 @@
             <param name="refresh.jboss" value="true"/>
         </antcall>
         <antcall target="provision.pfp.core">
-            <param name="refresh.jboss" value="false"/>
+            <param name="refresh.jboss" value="true"/>
         </antcall>
         <antcall target="temp.client.dir" />
         <antcall target="clean.jbpm.install" />

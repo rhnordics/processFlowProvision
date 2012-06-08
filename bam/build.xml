@@ -7,9 +7,10 @@
         <javac debug="true" srcdir="${subproject.name}/src/main/java" destdir="${subproject.build}" >
             <classpath refid="classpath" />
         </javac>
-        <copy toDir="${subproject.build}/META-INF/" overwrite="true" verbose="true" >
-            <fileset dir="${subproject.name}/src/main/resources/META-INF" />
-        </copy>
+        <antcall target="filter">
+            <param name="source.dir" value="${subproject.name}/src/main/resources"/>
+            <param name="dest.dir" value="${subproject.build}"/>
+        </antcall>
         <jar jarfile="${temp.services.dir}/processFlow-${subproject.name}Service.jar" 
             basedir="${subproject.build}" 
             includes="**/*BAMService*.class,META-INF/*"

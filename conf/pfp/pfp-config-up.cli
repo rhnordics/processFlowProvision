@@ -16,7 +16,7 @@ batch
 /system-property=hibernate.jdbc.batch_size:add(value=${hibernate.jdbc.batch_size})
 /system-property=hibernate.cache.use_second_level_cache:add(value=${hibernate.cache.use_second_level_cache})
 /system-property=hibernate.dialect:add(value=${hibernate.dialect})
-/system-property=hibernate.show_sql:add(value=${hibernate.show_sql})
+/system-property=hibernate.show_sql:add(value=${hibernate.show.sql})
 /system-property=org.jboss.processFlow.messaging.connectionFactory:add(value=${org.jboss.processFlow.messaging.connectionFactory})
 /system-property=space.delimited.process.event.listeners:add(value=${space.delimited.process.event.listeners})
 run-batch

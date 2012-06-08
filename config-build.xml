@@ -44,9 +44,9 @@
     <target name="refresh.jboss" >
         <fail unless="management.port" message="refresh.jboss:  need to pass 'management.port' property" />
         <fail unless="port.offset" message="refresh.jboss:  need to pass 'port.offset' property" />
-        <fail unless="new.server.configuration" message="clone.jboss:  need to pass 'new.server.configuration' property" />
+        <fail unless="new.server.configuration" message="refresh.jboss:  need to pass 'new.server.configuration' property" />
         <fail unless="server.config.file.with.no.suffix" message="refresh.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
-        <echo message="***** refresh.jboss :  will now call the following target :  stop.jboss, clone.jboss, and start.jboss" />
+        <echo message="***** refresh.jboss :  will now call the following target :  stop.jboss, refresh.jboss, and start.jboss" />
         <antcall target="stop.jboss" >
             <param name="management.port" value="${management.port}"/>
         </antcall>
@@ -349,12 +349,6 @@
         <fail unless="management.port" message="deploy.brms.webs:  need to pass 'management.port' property" />
         <jar jarfile="${temp.dir}/${guvnor.name}" basedir="${guvnor.target}" />
         <jar jarfile="${temp.dir}/${designer.name}" basedir="${designer.target}" />
-        <!--antcall target="execute.cli">
-            <param name="cli.source.dir" value="conf/brmsWebs"/>
-            <param name="cli.to.filter.and.execute" value="brmsWebs-config-down.cli"/>
-            <param name="management.port" value="${management.port}"/>
-            <param name="cli.fail.on.error" value="false"/>
-        </antcall -->
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/brmsWebs"/>
             <param name="cli.to.filter.and.execute" value="brmsWebs-config-up.cli"/>
@@ -484,14 +478,14 @@
         <antcall target="refreshGuvnor" />
     </target>
     <target name="provision.brms.webs" description="" >
-        <fail unless="refresh.jboss" message="different.brms.webs:  need to pass 'refresh.jboss' property" />
+        <fail unless="refresh.jboss" message="provision.brms.webs:  need to pass 'refresh.jboss' property" />
         <if>
             <equals arg1="${refresh.jboss}" arg2="true" />
             <then>
                 <antcall target="refresh.jboss" >
                     <param name="management.port" value="${brms.webs.management.port}"/>
                     <param name="port.offset" value="${brms.webs.port.offset}"/>
-                    <param name="new.server.configuration" value="${jboss.server.configuration}"/>
+                    <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
                     <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
                 </antcall>
             </then>
@@ -503,7 +497,7 @@
         <antcall target="distro.clean" />
         <antcall target="explode.guvnor.and.designer" />
         <antcall target="deploy.brms.webs" >
-            <param name="management.port" value="${management.port}"/>
+            <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>
     </target>
 
