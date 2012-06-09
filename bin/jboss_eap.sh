@@ -9,10 +9,15 @@ export jbossSocketBindingPortOffset=$4
 start() {
     echo -en $"Starting jboss daemon w/ following command line args: \n\tserver-config = $serverConfig\n\tjboss.server.base.dir = $jbossServerBaseDir \n\tjboss.socket.binding.port-offset = $jbossSocketBindingPortOffset \n\t"
      cd $JBOSS_HOME
+    if [ "$jbossServerBaseDir" = "standalone" ]; then
+        #  defining jboss.server.base.dir causes problems when deploying SOAP service on AS7.1.1    :   http://pastebin.com/qyX1crrT 
+        #  "standalone" server will be reserved for core functionality that needs SOAP
+        echo -en $"\nwill start standalone server base dir\n"
+        nohup ./bin/standalone.sh -b=$HOSTNAME -bmanagement=$HOSTNAME --server-config=$serverConfig -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset &
+    else
+        nohup ./bin/standalone.sh -b=$HOSTNAME -bmanagement=$HOSTNAME --server-config=$serverConfig -Djboss.server.base.dir=$jbossServerBaseDir -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset &
+    fi
    
-    #  defining jboss.server.base.dir causes problems when deploying SOAP service on AS7.1.1    :   http://pastebin.com/qyX1crrT 
-    #nohup ./bin/standalone.sh -b=$HOSTNAME -bmanagement=$HOSTNAME --server-config=$serverConfig -Djboss.server.base.dir=$jbossServerBaseDir -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset &
-    nohup ./bin/standalone.sh -b=$HOSTNAME -bmanagement=$HOSTNAME --server-config=$serverConfig -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset &
      sleep 10 
 }
 
