@@ -5,10 +5,6 @@
             <include name="**/*.jar" />
         </fileset>
         <fileset dir="${ENV.PFP_HOME}/lib" />
-        <fileset dir="${temp.ear.lib.dir}" />
-        <fileset dir="${temp.services.dir}" >
-            <include name="processFlow*.jar" />
-        </fileset>
     </path>
 
     <condition property="useCompiledJBPMLibs">

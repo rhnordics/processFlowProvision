@@ -2,38 +2,11 @@ batch
 deploy ${jdbc.lib.path}
 run-batch
 
-
-batch
-###  system properties
-/system-property=org.jboss.processFlow.statefulKnowledge.enableKnowledgeRuntimeLogger:add(value=${org.jboss.processFlow.statefulKnowledge.enableKnowledgeRuntimeLogger})
-/system-property=org.jboss.enableLog:add(value=${org.jboss.enableLog})
-/system-property=org.jboss.processFlow.KnowledgeSessionPool:add(value=${org.jboss.processFlow.KnowledgeSessionPool})
-/system-property=org.jboss.processFlow.bam.queue:add(value=${org.jboss.processFlow.bam.queue})
-
-/system-property=org.jboss.processFlow.messagingProvider:add(value=${org.jboss.processFlow.messagingProvider})
-
-/system-property=hibernate.hbm2ddl.auto:add(value=${hibernate.hbm2ddl.auto})
-/system-property=hibernate.jdbc.batch_size:add(value=${hibernate.jdbc.batch_size})
-/system-property=hibernate.cache.use_second_level_cache:add(value=${hibernate.cache.use_second_level_cache})
-/system-property=hibernate.dialect:add(value=${hibernate.dialect})
-/system-property=hibernate.show_sql:add(value=${hibernate.show.sql})
-/system-property=org.jboss.processFlow.messaging.connectionFactory:add(value=${org.jboss.processFlow.messaging.connectionFactory})
-/system-property=space.delimited.process.event.listeners:add(value=${space.delimited.process.event.listeners})
-run-batch
-
-
-
 ### datasources 
 batch
-### define jbpm-core_ds
 /subsystem=datasources/data-source=jbpm-core-cp:add(jndi-name=java:/global/jbpm-core-cp,connection-url=${jbpm_connection_url},driver-class=${jbpm_driver_class},driver-name=${jdbc.lib},user-name=${jbpm_db_user},password=${jbpm_db_password},pool-name=jbpm-core_ds_pool,max-pool-size=50,min-pool-size=10)
 /subsystem=datasources/data-source=jbpm-core-cp:enable()
  
 /subsystem=datasources/data-source=jbpm-bam-cp:add(jndi-name=java:/global/jbpm-bam-cp,connection-url=${bam_connection_url},driver-class=${bam_driver_class},driver-name=${jdbc.lib},user-name=${bam_db_user},password=${bam_db_password},pool-name=jbpm-bam_ds_pool,max-pool-size=50,min-pool-size=10)
 /subsystem=datasources/data-source=jbpm-bam-cp:enable()
 run-batch
-
-batch
-deploy ${temp.dir}/${pfp.ear.name}
-run-batch
-

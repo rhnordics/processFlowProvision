@@ -1,14 +1,15 @@
 #!/bin/sh
 
 export command=$1
-export serverConfig=$2
-export cliPort=$2
-export jbossServerBaseDir=$3
-export jbossSocketBindingPortOffset=$4
+export JBOSS_HOME=$2
+export serverConfig=$3
+export cliPort=$3
+export jbossServerBaseDir=$4
+export jbossSocketBindingPortOffset=$5
 
 start() {
     echo -en $"Starting jboss daemon w/ following command line args: \n\tserver-config = $serverConfig\n\tjboss.server.base.dir = $jbossServerBaseDir \n\tjboss.socket.binding.port-offset = $jbossSocketBindingPortOffset \n\t"
-     cd $JBOSS_HOME
+    cd $JBOSS_HOME
     if [ "$jbossServerBaseDir" = "standalone" ]; then
         #  defining jboss.server.base.dir causes problems when deploying SOAP service on AS7.1.1    :   http://pastebin.com/qyX1crrT 
         #  "standalone" server will be reserved for core functionality that needs SOAP
@@ -22,8 +23,7 @@ start() {
 }
 
 stop() {
-    echo -en $"stopping jboss daemon: "
-    cd $JBOSS_HOME
+    echo -en $"stopping jboss daemon: \n"
     ./bin/jboss-cli.sh --connect --controller=$HOSTNAME:$cliPort --command=:shutdown
     echo
     rm nohup.out
@@ -37,6 +37,8 @@ restart() {
 
 case "$1" in
     start|stop|restart)
+        cd $JBOSS_HOME
+        chmod 755 bin/*.sh
         $1
         ;;
     *)

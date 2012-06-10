@@ -13,6 +13,7 @@
         <exec executable="bash" failonerror="true" dir="." >
            <arg value="bin/jboss_eap.sh"/>
            <arg value="stop"/>
+           <arg value="${jboss.home}"/>
            <arg value="${management.port}"/>
         </exec>
     </target>
@@ -22,6 +23,7 @@
         <fail unless="server.config.file.with.no.suffix" message="start.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
         <exec executable="bin/jboss_eap.sh" failonerror="true" >
             <arg value="start"/>
+           <arg value="${jboss.home}"/>
             <arg value="${server.config.file.with.no.suffix}.xml"/>
             <arg value="${new.server.configuration}"/>
             <arg value="${port.offset}"/>
@@ -33,7 +35,7 @@
         </antcall>
         <antcall target="start.jboss" >
             <param name="port.offset" value="${pfp.core.port.offset}"/>
-            <param name="new.server.configuration" value="${jboss.server.configuration}"/>
+            <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
             <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
         </antcall>
     </target>
@@ -69,7 +71,6 @@
         </condition>
     </target>
 
-    <!-- create a clone of the JBoss EAP 'standalone' config and name it the value of ${jboss.server.configuration} -->
     <target name="clone.jboss" >
         <fail unless="new.server.configuration" message="clone.jboss:  need to pass 'new.server.configuration' property" />
         <delete dir="${jboss.home}/${new.server.configuration}" />
@@ -192,10 +193,6 @@
     </target>
 
     <target name="pfp-config" description="">
-        <copy toDir="${temp.ear.dir}/META-INF" >
-            <fileset dir="conf/pfp/META-INF"  />
-        </copy>
-        <jar jarfile="${temp.dir}/${pfp.ear.name}" basedir="${temp.ear.dir}" />
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/pfp"/>
             <param name="cli.to.filter.and.execute" value="pfp-config-up.cli"/>
@@ -214,11 +211,6 @@
                 <antcall target="useBRMSLibs" />
             </else>
         </if>
-        <copy toDir="${temp.ear.lib.dir}" overwrite="true" >
-            <fileset dir="lib" >
-                <include name="*.jar" />
-            </fileset>
-        </copy>
     </target>
 
     <target name="useBRMSLibs" depends="" if="useBRMS">
@@ -235,41 +227,6 @@
         <unzip src="${temp.dir}/jboss-jbpm-console.zip" dest="${temp.dir}" />
         <delete file="${temp.dir}/jboss-jbpm-console.zip" />
 
-        <copy toDir="${temp.ear.lib.dir}" overwrite="true" >
-            <fileset dir="${temp.dir}/designer.war/WEB-INF/lib" >
-                <include name="jackson*.jar" />
-            </fileset>
-            <fileset dir="${temp.dir}/binaries" >
-                <include name="antlr-3.3.jar" />
-                <include name="antlr-runtime-3.3.jar" />
-                <include name="commons-io*.jar" />
-                <include name="drools-*.jar" />
-                <include name="freemarker*.jar" />
-                <include name="jbpm-*.jar" />
-                <include name="knowledge-*.jar" />
-                <include name="mvel*.jar" />
-                <include name="protobuf-*.jar" />
-                <include name="stringtemplate*.jar" />
-                <include name="trove*.jar" />
-                <exclude name="*test*.jar" />
-            </fileset>
-            <fileset dir="${temp.dir}/gwt-console-server.war/WEB-INF/lib" >
-                <include name="apache-mime4j-*.jar" />
-                <include name="gwt-console-*.jar" />
-                <include name="jaxrs-api-*.jar" />
-                <include name="jbpm-gwt-shared-*.jar" />
-                <include name="jbpm-bpmn2-emfextmodel*.jar" />
-                <include name="jbpm-gwt-*.jar" />
-                <include name="jcip-annotations-*.jar" />
-                <include name="jsr250-*.jar" />
-                <include name="mina-*.jar" />
-                <include name="resteasy-*.jar" />
-                <include name="scannotation-*.jar" />
-
-                <!-- cant use because of services/properties in these libraries that over-ride our processFlowProvision extensions -->
-                <exclude name="jbpm-gwt-core-*.jar" />
-            </fileset>
-        </copy>
     </target>
 
     <!-- re-create guvnor filesystem and copy over repository.xml -->
@@ -292,18 +249,18 @@
     </target>
 
     <condition property="guvnorServerIsSameAsJBPM" >
-        <equals arg1="${brms.webs.server.configuration}" arg2="${jboss.domain.base.dir}" />
+        <equals arg1="${brms.webs.server.configuration}" arg2="${pfp.core.server.configuration}" />
     </condition>
 
     <target name="explode.brms.webs.into.core" if="guvnorServerIsSameAsJBPM" >
-        <antcall target="explode.guvnor.and.designer" />
+        <antcall target="explode.brms.webs" />
         <antcall target="deploy.brms.webs" >
-            <param name="management.port" value="${management.port}"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
     </target>
 
      <!-- this is common guvnor functionality whether guvnor is co-located with jbpm5 or is used in a different JBoss runtime -->
-    <target name="explode.guvnor.and.designer" >
+    <target name="explode.brms.webs" >
         <if>
             <isset property="useBRMS"/>
             <then>
@@ -353,6 +310,8 @@
         <fail unless="management.port" message="deploy.brms.webs:  need to pass 'management.port' property" />
         <jar jarfile="${temp.dir}/${guvnor.name}" basedir="${guvnor.target}" />
         <jar jarfile="${temp.dir}/${designer.name}" basedir="${designer.target}" />
+        <jar jarfile="${temp.dir}/${console.server.name}" basedir="${console.server.target}" />
+        <jar jarfile="${temp.dir}/${console.name}" basedir="${console.target}" />
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/brmsWebs"/>
             <param name="cli.to.filter.and.execute" value="brmsWebs-config-up.cli"/>
@@ -362,7 +321,7 @@
     </target>
 
 
-    <target name="explode.jBPM-gwt-console.into.jboss" >
+    <target name="explode.gwt.console.into.jboss" >
         <if>
             <isset property="useCompiledJBPMLibs"/>
             <then>
@@ -384,9 +343,6 @@
             </then>
         </if>
 
-        <move todir="${temp.ear.lib.dir}" >
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="commons-codec-*.jar" />
-        </move>
         <delete file="${console.server.target}/WEB-INF/classes/ChangeSet.xml" />
         <delete>
             <fileset dir="${console.server.target}/WEB-INF/lib/" includes="activation*.jar"/>
@@ -457,23 +413,17 @@
     </target>
 
     <target name="provision.pfp.core" description="">
-        <fail unless="refresh.jboss" message="provision.pfp.core:  need to pass 'refresh.jboss' property" />
         <antcall target="checkServersAndProjectLib" />
         <condition property="useBRMS">
             <not><isset property="upstream.jbpm5.drools.libs.type" /></not>
         </condition>
         <antcall target="distro.clean" />
-        <if>
-            <equals arg1="${refresh.jboss}" arg2="true" />
-            <then>
-                <antcall target="refresh.jboss" >
+        <antcall target="refresh.jboss" >
                     <param name="management.port" value="${pfp.core.management.port}"/>
                     <param name="port.offset" value="${pfp.core.port.offset}"/>
-                    <param name="new.server.configuration" value="${jboss.server.configuration}"/>
+                    <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
                     <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
-                </antcall>
-            </then>
-        </if>
+        </antcall>
         <antcall target="process.brms.libs" />
         <antcall target="explode.brms.webs.into.core" />
         <antcall target="hornetq-config" />
@@ -481,25 +431,19 @@
         <antcall target="qpid-config" />
     </target>
     <target name="provision.brms.webs" description="" >
-        <fail unless="refresh.jboss" message="provision.brms.webs:  need to pass 'refresh.jboss' property" />
         <antcall target="checkServersAndProjectLib" />
-        <if>
-            <equals arg1="${refresh.jboss}" arg2="true" />
-            <then>
-                <antcall target="refresh.jboss" >
+        <antcall target="refresh.jboss" >
                     <param name="management.port" value="${brms.webs.management.port}"/>
                     <param name="port.offset" value="${brms.webs.port.offset}"/>
                     <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
                     <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
-                </antcall>
-            </then>
-        </if>
+        </antcall>
         <mkdir dir="${install.home}/lib" />
         <condition property="useBRMS">
             <not><isset property="upstream.jbpm5.drools.libs.type" /></not>
         </condition>
         <antcall target="distro.clean" />
-        <antcall target="explode.guvnor.and.designer" />
+        <antcall target="explode.brms.webs" />
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>
