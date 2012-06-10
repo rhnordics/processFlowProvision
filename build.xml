@@ -2,15 +2,9 @@
 
     <import file="config-build.xml" />
     <import file="classpath-build.xml" />
-    <import file="interfaces/build.xml"/>
-    <import file="common/build.xml"/>
-    <import file="knowledgeSessionService/build.xml"/>
     
     <target name="clean" description="" >
         <delete dir="${guvnor_repo_location}" />
-        <delete dir="interfaces/${build.dir}" />
-        <delete dir="common/${build.dir}" />
-        <delete dir="knowledgeSessionService/${build.dir}" />
         <delete dir="${install.home}/tmp" />
         <delete dir="${temp.client.dir}" />
         <delete dir="${temp.distro.dir}" />
@@ -127,10 +121,7 @@
         <antcall target="clean" />
         <mkdir dir="${temp.ear.lib.dir}" />
         <mkdir dir="${install.home}/lib" />
-        <antcall target="setClasspath" />
-        <antcall target="interfaces" />
-        <antcall target="common" />
-        <antcall target="knowledgeSessionService" />
+        <antcall target="provision.switchyard.as7" />
         <antcall target="provision.brms.webs">
             <param name="refresh.jboss" value="true"/>
         </antcall>

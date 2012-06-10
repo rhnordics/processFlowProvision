@@ -152,7 +152,16 @@
 
  
 
-
+  <target name="provision.switchyard.as7" description="">
+    <delete dir="${jboss.home}" />
+    <echo message="Getting switchyard ..." />
+    <mkdir dir="${install.home}/lib"/>
+    <get src="${switchyard.as.download.url}" dest="${install.home}/lib/${switchyard.as.target.name}.zip"  skipexisting="true" />
+    <unzip src="${install.home}/lib/${switchyard.as.target.name}.zip" dest="${ENV.JBOSS_PROJECTS}" />
+    <copy toDir="${jboss.home}/standalone-orig" >
+        <fileset dir="${jboss.home}/standalone"  />
+    </copy>
+  </target>
 
   <target name="download.brms.deployable">
     <echo message="Getting BRMS ..." />
@@ -339,9 +348,6 @@
         </antcall>
         <copy file="conf/brmsWebs/designer/WEB-INF/jboss-web.xml" toDir="${designer.target}/WEB-INF" />
         <copy file="${jdbc.lib.path}" toDir="${guvnor.target}/WEB-INF/lib" />
-
-    <!-- may need to execute:  ant interfaces -->
-        <copy file="${temp.client.dir}/processFlow-interfaces.jar" toDir="${guvnor.target}/WEB-INF/lib" />
     </target>
     <target name="deploy.brms.webs" >
         <fail unless="management.port" message="deploy.brms.webs:  need to pass 'management.port' property" />
