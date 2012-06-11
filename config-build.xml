@@ -236,7 +236,9 @@
 
     <target name="download.community.webs.and.unzip" >
         <antcall target="download.drools.guvnor" />
+        <unzip src="${install.home}/lib/guvnor-distribution-wars-${drools.guvnor.version}-jboss-as-7.0.war" dest="${guvnor.target}" />
         <antcall target="download.designer" />
+        <unzip src="${install.home}/lib/designer-${designer.version}.war" dest="${designer.target}" />
 
         <antcall target="download.jBPM.gwt-console" />
         <unzip src="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip" dest="${temp.dir}" />
@@ -292,10 +294,10 @@
 
     <target name="deploy.brms.webs" >
         <fail unless="management.port" message="deploy.brms.webs:  need to pass 'management.port' property" />
-        <jar jarfile="${temp.dir}/${guvnor.name}.ready" basedir="${guvnor.target}" />
-        <jar jarfile="${temp.dir}/${designer.name}.ready" basedir="${designer.target}" />
-        <jar jarfile="${temp.dir}/${console.server.name}.ready" basedir="${console.server.target}" />
-        <jar jarfile="${temp.dir}/${console.name}.ready" basedir="${console.target}" />
+        <jar jarfile="${temp.dir}/${guvnor.name}" basedir="${guvnor.target}" />
+        <jar jarfile="${temp.dir}/${designer.name}" basedir="${designer.target}" />
+        <jar jarfile="${temp.dir}/${console.server.name}" basedir="${console.server.target}" />
+        <jar jarfile="${temp.dir}/${console.name}" basedir="${console.target}" />
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/brmsWebs"/>
             <param name="cli.to.filter.and.execute" value="brmsWebs-config-up.cli"/>

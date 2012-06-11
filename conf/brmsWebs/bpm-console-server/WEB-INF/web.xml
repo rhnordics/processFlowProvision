@@ -6,7 +6,7 @@
   <display-name>GWT Console Server</display-name>
 
   <context-param>
-    <param-name>javax.ws.rs.core.Application</param-name>
+    <param-name>javax.ws.rs.Application</param-name>
     <param-value>org.jboss.bpm.console.server.ConsoleServerApplication</param-value>
   </context-param>
 
@@ -50,12 +50,13 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Resteasy</web-resource-name>      
-      <!-- <url-pattern>/rs/process/*</url-pattern> -->
+      <url-pattern>/rs/process/*</url-pattern>
       <url-pattern>/rs/task/*</url-pattern>
       <url-pattern>/rs/form/*</url-pattern>
       <url-pattern>/rs/tasks/*</url-pattern>
       <url-pattern>/rs/identity/user/*</url-pattern>
       <url-pattern>/rs/identity/secure/*</url-pattern>
+      <url-pattern>/rs/history/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
         <!-- JA Bride :  for now, allow user with any role to login to gwt-console-server -->
