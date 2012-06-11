@@ -1,7 +1,6 @@
 <project name="processFlowProvision" default="all" >
 
     <import file="config-build.xml" />
-    <import file="classpath-build.xml" />
     
     <target name="clean" description="" >
         <delete dir="${guvnor_repo_location}" />
@@ -31,23 +30,13 @@
     </target>
 
     <target name="download.drools.guvnor">
-        <echo message="Getting Drools Guvnor ..." />
         <get src="${drools.guvnor.url}" dest="${install.home}/lib/guvnor-distribution-wars-${drools.guvnor.version}-jboss-as-7.0.war"  skipexisting="true" />
     </target>
     <target name="download.designer" >
         <get src="${designer.url}/designer-${designer.version}.war" dest="${install.home}/lib/designer-${designer.version}.war"  skipexisting="true" />
     </target>
     <target name="download.jBPM.gwt-console">
-        <property name="jBPM.url" value="file://${jbpm.source.dir}/jbpm-distribution/target" />
-        <get src="${jBPM.url}/jbpm-${console.server.version}-gwt-console.zip" dest="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip"  skipexisting="true" />
-        <unzip src="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip" dest="${temp.dir}" />
-    </target>
-
-    <target name="useCompiledJBPMLibs" depends="" if="useCompiledJBPMLibs">
-        <echo message="inside useCompiledJBPMLibs" />
-        <antcall target="download.drools.guvnor" />
-        <antcall target="download.designer" />
-        <antcall target="download.jBPM.gwt-console" />
+        <get src="${jbpm.console.download.url}/jbpm-${console.server.version}-gwt-console.zip" dest="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip"  skipexisting="true" />
     </target>
 
     <target name="all" >

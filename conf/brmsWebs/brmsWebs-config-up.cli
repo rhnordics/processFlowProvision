@@ -10,6 +10,6 @@ run-batch
 batch
 deploy ${guvnor.target}.ready
 deploy ${designer.target}.ready
-#deploy ${console.server.target}.ready
+deploy ${console.server.target}.ready
 #deploy ${console.target}.ready
 run-batch

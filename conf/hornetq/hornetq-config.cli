@@ -1,10 +1,6 @@
 batch
 /subsystem=messaging/hornetq-server=default/:write-attribute(name=message-counter-enabled,value=true)
  
-jms-queue add --queue-address=${org.jboss.processFlow.bam.queue} --entries=queue/${org.jboss.processFlow.bam.queue} --durable=true
- 
-/subsystem=messaging/hornetq-server=default/address-setting=jms.queue.${org.jboss.processFlow.bam.queue}/:add(address-full-policy=PAGE,dead-letter-address=jms.queue.DLQ,last-value-queue=false,max-size-bytes=10485760,page-size-bytes=1048576,send-to-dla-on-no-route=false)
- 
 /subsystem=messaging/hornetq-server=default/:write-attribute(name=cluster-password,value=${hornetq.cluster.password})
 
  # 10 May 2012:  clebert> jbride_:  in terms of :

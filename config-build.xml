@@ -201,20 +201,19 @@
         </antcall>
     </target>
 
-    <target name="process.brms.libs" >
+    <target name="download.jbpm5.artifacts" >
         <if>
-            <isset property="useCompiledJBPMLibs"/>
+            <equals arg1="${upstream.jbpm5.drools.libs.type}" arg2="COMMUNITY" />
             <then>
-                <antcall target="useCompiledJBPMLibs" />
+                <antcall target="download.community.webs.and.unzip" />
             </then>
             <else>
-                <antcall target="useBRMSLibs" />
+                <antcall target="download.brms.and.unzip" />
             </else>
         </if>
     </target>
 
-    <target name="useBRMSLibs" if="useBRMS">
-        <echo message="inside useBRMSLibs" />
+    <target name="download.brms.and.unzip">
         <antcall target="download.brms.deployable" />
         <unzip src="${install.home}/lib/${brms.deployable.suffix}" dest="${temp.dir}" />
         <delete file="${temp.dir}/modeshape.zip" />
@@ -227,30 +226,23 @@
         <unzip src="${temp.dir}/jboss-jbpm-console.zip" dest="${temp.dir}" />
         <delete file="${temp.dir}/jboss-jbpm-console.zip" />
 
+        <copy todir="${console.target}" >
+            <fileset dir="${temp.dir}/${console.name}.war" />
+        </copy>
+        <copy todir="${console.server.target}">
+            <fileset dir="${temp.dir}/gwt-console-server.war" />
+        </copy>
     </target>
 
-    <!-- re-create guvnor filesystem and copy over repository.xml -->
-    <target name="refreshGuvnor" description="" >
-        <delete dir="${guvnor_repo_location}" />
-        <mkdir dir="${guvnor_repo_location}" />
-        <if>
-            <not>
-                <equals arg1="${hibernate.dialect}" arg2="org.hibernate.dialect.HSQLDialect" />
-            </not>
-            <then>
-                <antcall target="filter">
-                    <param name="source.dir" value="conf/brmsWebs/drools-guvnor"/>
-                    <param name="file.name" value="repository.xml"/>
-                    <param name="dest.dir" value="${guvnor_repo_location}"/>
-                </antcall>
-            </then>
-        </if>
+    <target name="download.community.webs.and.unzip" >
+        <antcall target="download.drools.guvnor" />
+        <antcall target="download.designer" />
 
+        <antcall target="download.jBPM.gwt-console" />
+        <unzip src="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip" dest="${temp.dir}" />
+        <unzip src="${temp.dir}/jbpm-gwt-console-${console.server.version}.war" dest="${console.target}"/>
+        <unzip src="${temp.dir}/jbpm-gwt-console-server-${console.server.version}.war" dest="${console.server.target}"/>
     </target>
-
-    <condition property="guvnorServerIsSameAsJBPM" >
-        <equals arg1="${brms.webs.server.configuration}" arg2="${pfp.core.server.configuration}" />
-    </condition>
 
     <target name="explode.brms.webs.into.core" if="guvnorServerIsSameAsJBPM" >
         <antcall target="prepare.brms.webs" />
@@ -288,69 +280,14 @@
         <copy file="conf/brmsWebs/designer/WEB-INF/jboss-web.xml" toDir="${designer.target}/WEB-INF" />
         <copy file="${jdbc.lib.path}" toDir="${guvnor.target}/WEB-INF/lib" />
 
-        <antcall target="prepare.gwt.console.servers" />
-    </target>
-
-
-    <target name="prepare.gwt.console.servers" >
-        <if>
-            <isset property="useCompiledJBPMLibs"/>
-            <then>
-                <unzip src="${install.home}/lib/jbpm-${jBPM.version}-gwt-console.zip" dest="${temp.dir}" />
-                <unzip src="${temp.dir}/jbpm-gwt-console-${jBPM.version}.war" 
-                    dest="${console.target}"/>
-                <unzip src="${temp.dir}/jbpm-gwt-console-server-${jBPM.version}.war" dest="${console.server.target}"/>
-            </then>
-        </if>
-        <if>
-            <isset property="useBRMS"/>
-            <then>
-                <copy todir="${console.target}" >
-                    <fileset dir="${temp.dir}/${console.name}.war" />
-                </copy>
-                <copy todir="${console.server.target}">
-                    <fileset dir="${temp.dir}/gwt-console-server.war" />
-                </copy>
-            </then>
-        </if>
-
+        <!-- gwt-console configs -->
         <delete file="${console.server.target}/WEB-INF/classes/ChangeSet.xml" />
-        <delete>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="activation*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="antlr*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="apache-mime4j*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="commons-io-*.jar" />
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="drools-*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="freemarker*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="gwt-console*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="hornetq*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="javassist*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="jaxrs*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="jbpm*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="jcip-annotations*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="jsr250-api*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="knowledge-*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="log4j*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="mina*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="protobuf*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="resteasy*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="scannotation*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="slf4j*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="mvel*.jar"/>
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="stringtemplate*.jar" />
-            <fileset dir="${console.server.target}/WEB-INF/lib/" includes="sjsxp-*.jar" />
-            <fileset dir="${console.server.target}/WEB-INF/classes/META-INF" includes="persistence.xml" />
-        </delete>
-        <delete>
-            <fileset dir="${console.target}/WEB-INF/lib/" includes="slf4j*.jar" />
-        </delete>
-
-        <!-- authentication configuration -->
         <copy file="conf/brmsWebs/bpm-console-server/WEB-INF/web.xml" toDir="${console.server.target}/WEB-INF" overwrite="true" />
         <delete file="${console.server.target}/WEB-INF/classes/jbpm.console.properties" />
         <copy toDir="${console.server.target}/WEB-INF/classes/META-INF/services"  overwrite="true" verbose="true" >
             <fileset dir="conf/brmsWebs/bpm-console-server/WEB-INF/classes/META-INF/services/"  />
         </copy>
+
     </target>
 
     <target name="deploy.brms.webs" >
@@ -392,6 +329,29 @@
     <delete dir="${eclipse.home}/drools-update-site"/>
   </target>
 
+    <!-- re-create guvnor filesystem and copy over repository.xml -->
+    <target name="refreshGuvnor" description="" >
+        <delete dir="${guvnor_repo_location}" />
+        <mkdir dir="${guvnor_repo_location}" />
+        <if>
+            <not>
+                <equals arg1="${hibernate.dialect}" arg2="org.hibernate.dialect.HSQLDialect" />
+            </not>
+            <then>
+                <antcall target="filter">
+                    <param name="source.dir" value="conf/brmsWebs/drools-guvnor"/>
+                    <param name="file.name" value="repository.xml"/>
+                    <param name="dest.dir" value="${guvnor_repo_location}"/>
+                </antcall>
+            </then>
+        </if>
+    </target>
+
+    <condition property="guvnorServerIsSameAsJBPM" >
+        <equals arg1="${brms.webs.server.configuration}" arg2="${pfp.core.server.configuration}" />
+    </condition>
+
+
     <target name="distro.clean" >
         <delete dir="${temp.dir}" />
         <delete dir="${install.home}/${guvnor.name}" />
@@ -400,9 +360,6 @@
 
     <target name="provision.pfp.core" description="">
         <antcall target="checkServersAndProjectLib" />
-        <condition property="useBRMS">
-            <not><isset property="upstream.jbpm5.drools.libs.type" /></not>
-        </condition>
         <antcall target="distro.clean" />
         <antcall target="refresh.jboss" >
             <param name="management.port" value="${pfp.core.management.port}"/>
@@ -410,7 +367,7 @@
             <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
             <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
         </antcall>
-        <antcall target="process.brms.libs" />
+        <antcall target="download.jbpm5.artifacts" />
         <antcall target="explode.brms.webs.into.core" />
         <antcall target="hornetq-config" />
         <antcall target="pfp-config" />
@@ -425,16 +382,12 @@
             <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
         </antcall>
         <mkdir dir="${install.home}/lib" />
-        <condition property="useBRMS">
-            <not><isset property="upstream.jbpm5.drools.libs.type" /></not>
-        </condition>
         <antcall target="distro.clean" />
-        <antcall target="process.brms.libs" />
+        <antcall target="download.jbpm5.artifacts" />
         <antcall target="prepare.brms.webs" />
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>
     </target>
-
 
 </project>
