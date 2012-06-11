@@ -213,7 +213,7 @@
         </if>
     </target>
 
-    <target name="useBRMSLibs" depends="" if="useBRMS">
+    <target name="useBRMSLibs" if="useBRMS">
         <echo message="inside useBRMSLibs" />
         <antcall target="download.brms.deployable" />
         <unzip src="${install.home}/lib/${brms.deployable.suffix}" dest="${temp.dir}" />
@@ -223,7 +223,7 @@
         <unzip src="${temp.dir}/jboss-brms-manager.zip" dest="${temp.dir}" />
         <delete file="${temp.dir}/jboss-brms-manager.zip" />
 
-        <!-- contains: "business-central.war",  "designer.war", "gwt-console-server.war" &  "jbpm-human-task.war" -->
+        <!-- contains: "business-central.war",  "designer.war", "jbpm-gwt-console-server.war" &  "jbpm-human-task.war" -->
         <unzip src="${temp.dir}/jboss-jbpm-console.zip" dest="${temp.dir}" />
         <delete file="${temp.dir}/jboss-jbpm-console.zip" />
 
@@ -253,32 +253,14 @@
     </condition>
 
     <target name="explode.brms.webs.into.core" if="guvnorServerIsSameAsJBPM" >
-        <antcall target="explode.brms.webs" />
+        <antcall target="prepare.brms.webs" />
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
     </target>
 
      <!-- this is common guvnor functionality whether guvnor is co-located with jbpm5 or is used in a different JBoss runtime -->
-    <target name="explode.brms.webs" >
-        <if>
-            <isset property="useBRMS"/>
-            <then>
-                <copy todir="${console.target}" >
-                    <fileset dir="${temp.dir}/${console.name}.war" />
-                </copy>
-                <copy todir="${guvnor.target}" >
-                    <fileset dir="${temp.dir}/jboss-brms.war" />
-                </copy>
-                <copy todir="${designer.target}" >
-                    <fileset dir="${temp.dir}/designer.war" />
-                </copy>
-            </then>
-            <else>
-                <unzip src="${install.home}/lib/guvnor-distribution-wars-${drools.guvnor.version}-jboss-as-7.0.war" dest="${guvnor.target}" />
-                <unzip src="${install.home}/lib/designer-${designer.version}.war" dest="${designer.target}" />
-            </else>
-        </if>
+    <target name="prepare.brms.webs" >
         <antcall target="filter">
             <param name="source.dir" value="conf/brmsWebs/drools-guvnor/WEB-INF"/>
             <param name="file.name" value="beans.xml"/>
@@ -305,23 +287,12 @@
         </antcall>
         <copy file="conf/brmsWebs/designer/WEB-INF/jboss-web.xml" toDir="${designer.target}/WEB-INF" />
         <copy file="${jdbc.lib.path}" toDir="${guvnor.target}/WEB-INF/lib" />
-    </target>
-    <target name="deploy.brms.webs" >
-        <fail unless="management.port" message="deploy.brms.webs:  need to pass 'management.port' property" />
-        <jar jarfile="${temp.dir}/${guvnor.name}" basedir="${guvnor.target}" />
-        <jar jarfile="${temp.dir}/${designer.name}" basedir="${designer.target}" />
-        <jar jarfile="${temp.dir}/${console.server.name}" basedir="${console.server.target}" />
-        <jar jarfile="${temp.dir}/${console.name}" basedir="${console.target}" />
-        <antcall target="execute.cli">
-            <param name="cli.source.dir" value="conf/brmsWebs"/>
-            <param name="cli.to.filter.and.execute" value="brmsWebs-config-up.cli"/>
-            <param name="management.port" value="${management.port}"/>
-            <param name="cli.fail.on.error" value="true"/>
-        </antcall>
+
+        <antcall target="prepare.gwt.console.servers" />
     </target>
 
 
-    <target name="explode.gwt.console.into.jboss" >
+    <target name="prepare.gwt.console.servers" >
         <if>
             <isset property="useCompiledJBPMLibs"/>
             <then>
@@ -382,6 +353,21 @@
         </copy>
     </target>
 
+    <target name="deploy.brms.webs" >
+        <fail unless="management.port" message="deploy.brms.webs:  need to pass 'management.port' property" />
+        <jar jarfile="${temp.dir}/${guvnor.name}.ready" basedir="${guvnor.target}" />
+        <jar jarfile="${temp.dir}/${designer.name}.ready" basedir="${designer.target}" />
+        <jar jarfile="${temp.dir}/${console.server.name}.ready" basedir="${console.server.target}" />
+        <jar jarfile="${temp.dir}/${console.name}.ready" basedir="${console.target}" />
+        <antcall target="execute.cli">
+            <param name="cli.source.dir" value="conf/brmsWebs"/>
+            <param name="cli.to.filter.and.execute" value="brmsWebs-config-up.cli"/>
+            <param name="management.port" value="${management.port}"/>
+            <param name="cli.fail.on.error" value="true"/>
+        </antcall>
+    </target>
+
+
     <target name="clean.jbpm.install" depends="">
         <!-- JA Bride :  now deleting anything that is not previously downloaded -->
         <delete >
@@ -419,10 +405,10 @@
         </condition>
         <antcall target="distro.clean" />
         <antcall target="refresh.jboss" >
-                    <param name="management.port" value="${pfp.core.management.port}"/>
-                    <param name="port.offset" value="${pfp.core.port.offset}"/>
-                    <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
-                    <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
+            <param name="port.offset" value="${pfp.core.port.offset}"/>
+            <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
+            <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
         </antcall>
         <antcall target="process.brms.libs" />
         <antcall target="explode.brms.webs.into.core" />
@@ -433,17 +419,18 @@
     <target name="provision.brms.webs" description="" >
         <antcall target="checkServersAndProjectLib" />
         <antcall target="refresh.jboss" >
-                    <param name="management.port" value="${brms.webs.management.port}"/>
-                    <param name="port.offset" value="${brms.webs.port.offset}"/>
-                    <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
-                    <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
+            <param name="management.port" value="${brms.webs.management.port}"/>
+            <param name="port.offset" value="${brms.webs.port.offset}"/>
+            <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
+            <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
         </antcall>
         <mkdir dir="${install.home}/lib" />
         <condition property="useBRMS">
             <not><isset property="upstream.jbpm5.drools.libs.type" /></not>
         </condition>
         <antcall target="distro.clean" />
-        <antcall target="explode.brms.webs" />
+        <antcall target="process.brms.libs" />
+        <antcall target="prepare.brms.webs" />
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>

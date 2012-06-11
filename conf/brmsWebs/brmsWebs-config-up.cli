@@ -8,8 +8,8 @@ batch
 run-batch
 
 batch
-deploy ${temp.dir}/${guvnor.name}
-deploy ${temp.dir}/${designer.name}
-deploy ${temp.dir}/${console.server.name}
-deploy ${temp.dir}/${console.name}
+deploy ${guvnor.target}.ready
+deploy ${designer.target}.ready
+#deploy ${console.server.target}.ready
+#deploy ${console.target}.ready
 run-batch

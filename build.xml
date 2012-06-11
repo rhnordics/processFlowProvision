@@ -39,7 +39,8 @@
     </target>
     <target name="download.jBPM.gwt-console">
         <property name="jBPM.url" value="file://${jbpm.source.dir}/jbpm-distribution/target" />
-        <get src="${jBPM.url}/jbpm-${console.server.version}-gwt-console.zip" dest="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip"  />
+        <get src="${jBPM.url}/jbpm-${console.server.version}-gwt-console.zip" dest="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip"  skipexisting="true" />
+        <unzip src="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip" dest="${temp.dir}" />
     </target>
 
     <target name="useCompiledJBPMLibs" depends="" if="useCompiledJBPMLibs">
