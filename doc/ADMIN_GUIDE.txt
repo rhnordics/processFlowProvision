@@ -3,41 +3,6 @@ processFlowProvision (aka:  PFP)
 JA Bride
 
 
-ASSUMPTIONS
-    - you are a RHCE (or equivalent in a Unix environment)
-    - you are installing on Fedora 14,16 or Red Hat Enterprise Linux (RHEL) 6.*
-
-
-OVERVIEW
-    - PFP offers BRMS administrators & developers the following :
-      1)  this document which outlines the entire provisioning process of one example of a production BRMS deployable environment
-        - NOTE:  the tasks outlined in this document are written in sequential order
-        - subsequently, it's best to start at the beginning of this document and progress in the order this doc is written
-        - this document includes the following chapters:
-            1)  ASSUMPTIONS
-            2)  OVERVIEW
-            3)  INSTALL
-            4)  POST INSTALL ADMINISTRATION
-
-      2)  an ant script which is executed as part of this BRMS deployable provisioning
-        - what does the ant script do ?
-            - once Apache Ant 1.8.3 has been installed (as outlined below in this document), 
-              you'll be able to view a description of the various ant targets by executing from the root of this project:   ant -p
-        - how is the ant script executed ?
-            - there is a section towards the latter part of this document entitled:  "deploy BRMS runtime artifacts to JBoss EAP"
-            - if provisioning a new BRMS environment, then this section explains the how to execute the ant script to do that
-            - please ensure all of the previous steps outlined in this document have been completed prior to executing the ant script
-
-
-  - why doesn't PFP leverage BRMS Standalone rather than BRMS Deployable ?
-        - there are architectural decisions implemented in BRMS Standalone that are sufficient for a demo, but problably would not do well in production
-        - BRMS Deployable provides maximum flexibility by allowing a software team to embed supported Drools and jbpm5 libraries 
-          into a customer solution tailored toward their specific production requirements
-        - the PFP team has taken advantage of the flexibility provided by BRMS Deployable and built one example of an optimized, fully-featured and
-          easily administered BRMS production deployment.
-
-
-
 INSTALL   :
     -- NOTE:  almost all of the following tasks can (and should probably be) automated via a kickstart provisioning script
 
@@ -231,52 +196,6 @@ INSTALL   :
 
 
  
-    -- JBoss Enterprise App Platform (JBoss EAP)
-            -- processFlowProvision is deployed in a JBoss EAP container.
-            -- the latest binary distro of JBoss EAP will need to be manually downloaded and installed on each target machine
-            -- download the jboss-eap-5.1.0.zip to $JBOSS_PROJECTS/downloads
-
-                -- aquire directly from Red Hat Support Portal :
-                    https://access.redhat.com/jbossnetwork/restricted/listSoftware.html?downloadType=distributions&product=appplatform&version=5.1.2
-
-                -- otherwise, if your organization has standardized on a particular EAP 5.* and that EAP download is available on a corporate server,
-                    then feel free to use that
-
-            -- upon completion of download, unzip JBoss EAP to the '$JBOSS_PROJECTS/jboss' directory
-              (as jboss)
-                    unzip $JBOSS_PROJECTS/downloads/jboss-eap-5.1.0.zip -d $JBOSS_PROJECTS/jboss
-
-
-    -- messaging
-            - processFlowProvision makes use of a JMS messaging provider for several use cases to include transport of BRMS BAM events
-            - two JMS providers are supported :   Hornetq 2.2.2 (or greater)  or MRG-M (0.10 or greater)
-            - selection of the messaging provider is via the following property in processFlowProvision/build.properties :      org.jboss.processFlow.messagingProvider
-
-            --  HornetQ 
-                - if selecting Hornetq, this build procedure assumes the embedded Hornetq provided by EAP6 will be used
-
-                -- (optional) :  route HornetQ broadcast traffic to a specific network interface card 
-                    - execute the following if Hornetq is bound to a NIC that is not the default for the OS
-                    - (as root) : route add -net 231.0.0.0 netmask 255.0.0.0 eth0
-
-
-                                or
-
-
-            -- Qpid/Red Hat Messaging
-                -- (as root) :  yum install qpid-cpp-client qpid-cpp-server qpid-cpp-server-store qpid-tools
-                -- (as root) :  qpid-config -a $HOSTNAME:5672 add exchange direct org.jboss.direct
-
-
-    -- BRMS 5.3 Early Adapter libraries
-        -- processFlowProvision is an extension of Red Hat BRMS
-        -- subsequently, processFlowProvision is reliant on BRMS libraries and runtime artifacts
-        -- these BRMS libraries and runtime artifacts can be aquired via the Red Hat Partner site (applicable until June 2012 while BRMS Early Adapter program is on going)
-
-        (as jboss)  cd $JBOSS_PROJECTS/processFlowProvision
-                    vi processFlowProvision/build.properties     
-                        ensure that:  upstream.jbpm5.drools.libs.type=BRMS 
-
 
     - deploy BRMS-web artifacts (guvnor, designer, gwt-console-server) to JBoss EAP
        (as jboss) 
