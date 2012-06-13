@@ -61,38 +61,3 @@ FEATURES
         1)  jbpm-core-cp
         2)  guvnor-cp
         3)  jbpm-bam
-
-
-4)  EJB stateless/singleton services
-    - Exposes full functionality of BRMS APIs to remote clients
-    - Allows for scalability / fail-over in distributed environment
-    - Allows for wrapping with REST or SOAP endpoints
-    - Allows for runtime configuration of JAAS policies
-        - Authentication requirements
-        - Method-level authorization
-        - Programmatic authorization via SessionContext
-
-
-5)  task functionality
-    - No longer uses a Mina /Hornet-q messaging provider nor jbpm5 "Task Server"
-    - instead, exposes task related API as EJB3
-    - greatly simplifies environment
-    - substantial performance and concurrency improvements 
-    - leverages BRMS TaskServiceSession directly
-    - BRMS human task functionality is centralized
-
-
-6)  StatefulKnowledgeSession functionality
-    - “stateful knowledge session per processInstance” architecture
-    - allows for concurrency without invoking various optimistic lock exceptions
-    - recycles database SessionInfo records after process instance completion
-    - drools/jbpm5 process engine functionality is centralized
-    - forwards process engine BAM events to a messaging provider
-    - significantly more performant than persisting BAM event to RDBMS in same thread of execution as process engine
-
-
-7)  bam functionality
-    - bam data maintains relationship between:
-        parent process instances and its sub-process instances
-    - this allows BAM reporting that can be depicted in a tree structure
-    - within the BAM audit-trail tree structure, the BAM reports can be generated that include any human task variables that existed at that time
