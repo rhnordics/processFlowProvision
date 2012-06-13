@@ -96,6 +96,10 @@
             <param name="dest.dir" value="${temp.dir}"/>
         </antcall>
         <if>
+            <not><isset property="server.ip.address"/></not>
+            <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then>
+        </if>
+        <if>
             <not><isset property="management.port"/></not>
             <then><property name="management.port" value="9999" /></then>
         </if>
@@ -106,7 +110,7 @@
         <echo message="***** execute.cli :  about to execute following batch script = ${temp.dir}/${cli.to.filter.and.execute} : cli.fail.on.error = ${cli.fail.on.error}" />
         <exec executable="${jboss.home}/bin/jboss-cli.sh" failonerror="${cli.fail.on.error}">
             <arg value="--connect"/>
-            <arg value="--controller=${ENV.HOSTNAME}:${management.port}"/>
+            <arg value="--controller=${server.ip.address}:${management.port}"/>
             <arg value="-c"/>
             <arg value="--file=${temp.dir}/${cli.to.filter.and.execute}"/>
         </exec>
@@ -187,6 +191,7 @@
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/hornetq/"/>
             <param name="cli.to.filter.and.execute" value="hornetq-config.cli"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
     </target>
@@ -198,6 +203,7 @@
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/qpid"/>
             <param name="cli.to.filter.and.execute" value="qpid-config.cli"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
     </target>
@@ -206,6 +212,7 @@
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/pfp"/>
             <param name="cli.to.filter.and.execute" value="pfp-config-up.cli"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="management.port" value="${pfp.core.management.port}"/>
             <param name="cli.fail.on.error" value="true"/>
         </antcall>
@@ -311,6 +318,7 @@
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/brmsWebs"/>
             <param name="cli.to.filter.and.execute" value="brmsWebs-config-up.cli"/>
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
             <param name="management.port" value="${management.port}"/>
             <param name="cli.fail.on.error" value="true"/>
         </antcall>
