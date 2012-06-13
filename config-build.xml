@@ -1,4 +1,4 @@
-<project name="processFlowProvision-distro" default="provision.pfp.core" >
+<project name="processFlowProvision-distro" default="all" >
 
     <property environment="ENV"/>
     <property file="build.properties" />
@@ -158,7 +158,7 @@
     <echo message="Getting switchyard ..." />
     <mkdir dir="${install.home}/lib"/>
     <get src="${switchyard.as.download.url}" dest="${install.home}/lib/${switchyard.as.target.name}.zip"  skipexisting="true" />
-    <unzip src="${install.home}/lib/${switchyard.as.target.name}.zip" dest="${ENV.JBOSS_PROJECTS}" />
+    <unzip src="${install.home}/lib/${switchyard.as.target.name}.zip" dest="${jboss.projects}" />
     <copy toDir="${jboss.home}/standalone-orig" >
         <fileset dir="${jboss.home}/standalone"  />
     </copy>
@@ -169,6 +169,16 @@
     <mkdir dir="${install.home}/lib"/>
     <get src="${brms.download.url}" dest="${install.home}/lib/${brms.deployable.suffix}"  skipexisting="true" />
   </target>
+  <target name="download.drools.guvnor">
+        <get src="${drools.guvnor.url}" dest="${install.home}/lib/guvnor-distribution-wars-${drools.guvnor.version}-jboss-as-7.0.war"  skipexisting="true" />
+  </target>
+  <target name="download.designer" >
+        <get src="${designer.url}/designer-${designer.version}.war" dest="${install.home}/lib/designer-${designer.version}.war"  skipexisting="true" />
+  </target>
+  <target name="download.jBPM.gwt-console">
+        <get src="${jbpm.console.download.url}/jbpm-${console.server.version}-gwt-console.zip" dest="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip"  skipexisting="true" />
+  </target>
+
 
     <condition property="useHornetQ" >
         <equals arg1="${org.jboss.processFlow.messagingProvider}" arg2="HORNETQ" />
@@ -390,6 +400,20 @@
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>
+    </target>
+
+    <target name="all" >
+        <mkdir dir="${install.home}/lib" />
+        <antcall target="stop.jboss" >
+            <param name="management.port" value="${brms.webs.management.port}"/>
+        </antcall>
+        <antcall target="stop.jboss" >
+            <param name="management.port" value="${pfp.core.management.port}"/>
+        </antcall>
+        <antcall target="provision.switchyard.as7" />
+        <antcall target="provision.brms.webs" />
+        <antcall target="provision.pfp.core" />
+        <antcall target="clean.jbpm.install" />
     </target>
 
 </project>

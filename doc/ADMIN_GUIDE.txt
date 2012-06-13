@@ -67,6 +67,8 @@ INSTALL   :
                            yum install java-1.6.0-sun
                            yum install java-1.6.0-sun-devel
 
+    --  git and wget
+        (as root)   :   yum install git wget
 
 
     -- 'jboss' operating system user
@@ -78,30 +80,33 @@ INSTALL   :
 
 
 
-
     --  $JBOSS_PROJECTS directory
             -- make a 'jbossProjects' directory and have it owned by jboss:jboss
                 (as root) :     mkdir -p /opt/jbossProjects/jboss
                                 mkdir /opt/jbossProjects/downloads
                                 chown -R jboss:100 /opt/jbossProjects
 
-    --  git and wget
-        (as root)   :   yum install git wget
+
+    --  required PFP shell environment variables
+          PFP_HOME          :   location of process flow provision project
+          JBOSS_PROJECTS    :   default location of guvnor filesystem
+      - these environment variables are set via the standard ~/.bashrc
+      - processFlowProvision maintains a template bashrc
+      - execute the following to copy the template bashrc to the 'jboss' users home directory :
+            (as jboss):     cd /opt/jbossProjects/processFlowProvision
+                            cp ~/.bashrc ~/.bashrc.bak
+                            cp conf/shell/bashrc ~/.bashrc
+                            cp conf/git/git_completion ~/.git_completion
+                            ( review the newly copied ~/.bashrc and modify where appropriate )
+                            source ~/.bashrc
 
 
+    -- Process Flow Provision distribution
+        - cd $JBOSS_PROJECTS
+        - wget http://http://people.redhat.com/jbride/distro/processFlow-bin-switchyard-as7.zip
+        -unzip processFlow-bin-switchyard-as7.zip
 
-    --  processFlowProvision project
-        --  'jboss' environment variables
-            - processFlowProvision is reliant on environment variables with correct settings
-            - these environment variables are set via the standard ~/.bashrc
-            - processFlowProvision maintains a template bashrc
-            - execute the following to copy the template bashrc to the 'jboss' users home directory :
-                (as jboss):     cd /opt/jbossProjects/processFlowProvision
-                                cp ~/.bashrc ~/.bashrc.bak
-                                cp conf/shell/bashrc ~/.bashrc
-                                cp conf/git/git_completion ~/.git_completion
-                                ( review the newly copied ~/.bashrc and modify where appropriate )
-                                source ~/.bashrc
+
 
                                 
   --  firewall configuration
@@ -311,23 +316,7 @@ POST INSTALL ADMINISTRATION
 
 
 modifications to runtime directory structure
-  - $JBOSS_HOME/server/default-${organization.name}             
-        - PFP enabled JBoss runtime
-        - created with execution of 'ant' from $JBOSS_PROJECTS/processFlowProvision
-        - new directory is cloned from $JBOSS_HOME/server/default and then modified with BRMS and PFP enhancements
-
-
-  - $JBOSS_HOME/server/default-${organization.name}/deploy/${organization.name}
-        - hot deployable runtime directory with most BRMS and PFP artifacts
-
-  
-  - $JBOSS_HOME/server/default-${organization.name}/deploy/properties-service.xml
-        - MBean that registers various BRMS and PFP system properties
-
-
-  - $JBOSS_HOME/server/default-${organization.name}/lib/${organization.name}
-        - location of all BRMS and PFP static libraries
-        - JBoss adds these static libraries to its unifiedclassloader where these classes are accessible by all runtime artifacts
+    - TO-DO
 
 
 
