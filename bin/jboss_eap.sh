@@ -1,22 +1,29 @@
 #!/bin/sh
 
+# shared
 export command=$1
 export JBOSS_HOME=$2
-export serverConfig=$3
-export cliPort=$3
-export jbossServerBaseDir=$4
-export jbossSocketBindingPortOffset=$5
+export hostName=$3
+
+# start
+export serverConfig=$4
+export jbossServerBaseDir=$5
+export jbossSocketBindingPortOffset=$6
+
+# stop
+export cliPort=$4
 
 start() {
     echo -en $"Starting jboss daemon w/ following command line args: \n\tserver-config = $serverConfig\n\tjboss.server.base.dir = $jbossServerBaseDir \n\tjboss.socket.binding.port-offset = $jbossSocketBindingPortOffset \n\t"
     cd $JBOSS_HOME
+
     if [ "$jbossServerBaseDir" = "standalone" ]; then
         #  defining jboss.server.base.dir causes problems when deploying SOAP service on AS7.1.1    :   http://pastebin.com/qyX1crrT 
         #  "standalone" server will be reserved for core functionality that needs SOAP
         echo -en $"\nwill start standalone server base dir\n"
-        nohup ./bin/standalone.sh -b=$HOSTNAME -bmanagement=$HOSTNAME --server-config=$serverConfig -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset &
+        nohup ./bin/standalone.sh -b=$hostName -bmanagement=$hostName --server-config=$serverConfig -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset $JAVA_OPTS &
     else
-        nohup ./bin/standalone.sh -b=$HOSTNAME -bmanagement=$HOSTNAME --server-config=$serverConfig -Djboss.server.base.dir=$jbossServerBaseDir -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset &
+        nohup ./bin/standalone.sh -b=$hostName -bmanagement=$hostName --server-config=$serverConfig -Djboss.server.base.dir=$jbossServerBaseDir -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset $JAVA_OPTS &
     fi
    
      sleep 10 
@@ -24,7 +31,7 @@ start() {
 
 stop() {
     echo -en $"stopping jboss daemon: \n"
-    ./bin/jboss-cli.sh --connect --controller=$HOSTNAME:$cliPort --command=:shutdown
+    ./bin/jboss-cli.sh --connect --controller=$hostName:$cliPort --command=:shutdown
     echo
     rm nohup.out
     sleep 2

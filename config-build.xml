@@ -10,42 +10,53 @@
 
     <target name="stop.jboss" >
         <fail unless="management.port" message="stop.jboss:  need to pass 'management.port' property" />
+        <if>
+            <not><isset property="server.ip.address"/></not>
+            <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then>
+        </if>
         <exec executable="bash" failonerror="true" dir="." >
            <arg value="bin/jboss_eap.sh"/>
            <arg value="stop"/>
            <arg value="${jboss.home}"/>
+           <arg value="${server.ip.address}"/>
            <arg value="${management.port}"/>
         </exec>
     </target>
     <target name="start.jboss" >
+        <fail unless="server.ip.address" message="start.jboss:  need to pass 'server.ip.address' property" />
         <fail unless="port.offset" message="start.jboss:  need to pass 'port.offset' property" />
         <fail unless="new.server.configuration" message="start.jboss:  need to pass 'new.server.configuration' property" />
         <fail unless="server.config.file.with.no.suffix" message="start.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
         <exec executable="bin/jboss_eap.sh" failonerror="true" >
             <arg value="start"/>
-           <arg value="${jboss.home}"/>
+            <arg value="${jboss.home}"/>
+            <arg value="${server.ip.address}"/>
             <arg value="${server.config.file.with.no.suffix}.xml"/>
             <arg value="${new.server.configuration}"/>
             <arg value="${port.offset}"/>
         </exec>
     </target>
-    <target name="bounce.jboss" description="">
+    <target name="bounce.pfp.core" description="">
         <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
         <antcall target="start.jboss" >
             <param name="port.offset" value="${pfp.core.port.offset}"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
             <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
         </antcall>
     </target>
     <target name="refresh.jboss" >
+        <fail unless="server.ip.address" message="refresh.jboss:  need to pass 'server.ip.address' property" />
         <fail unless="management.port" message="refresh.jboss:  need to pass 'management.port' property" />
         <fail unless="port.offset" message="refresh.jboss:  need to pass 'port.offset' property" />
         <fail unless="new.server.configuration" message="refresh.jboss:  need to pass 'new.server.configuration' property" />
         <fail unless="server.config.file.with.no.suffix" message="refresh.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
         <echo message="***** refresh.jboss :  will now call the following target :  stop.jboss, refresh.jboss, and start.jboss" />
         <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${server.ip.address}"/>
             <param name="management.port" value="${management.port}"/>
         </antcall>
         <antcall target="clone.jboss" >
@@ -54,6 +65,7 @@
         <antcall target="start.jboss" >
             <param name="port.offset" value="${port.offset}"/>
             <param name="new.server.configuration" value="${new.server.configuration}"/>
+            <param name="server.ip.address" value="${server.ip.address}"/>
         </antcall>
     </target>
     <target name="checkServersAndProjectLib">
@@ -385,11 +397,17 @@
     <target name="provision.pfp.core" description="">
         <antcall target="checkServersAndProjectLib" />
         <antcall target="distro.clean" />
+        <antcall target="filter">
+            <param name="source.dir" value="conf/pfp"/>
+            <param name="file.name" value="standalone.conf"/>
+            <param name="dest.dir" value="${jboss.home}/bin"/>
+        </antcall>
         <antcall target="refresh.jboss" >
             <param name="management.port" value="${pfp.core.management.port}"/>
             <param name="port.offset" value="${pfp.core.port.offset}"/>
             <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
             <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
         </antcall>
         <antcall target="download.jbpm5.artifacts" />
         <antcall target="explode.brms.webs.into.core" />
@@ -399,11 +417,17 @@
     </target>
     <target name="provision.brms.webs" description="" >
         <antcall target="checkServersAndProjectLib" />
+        <antcall target="filter">
+            <param name="source.dir" value="conf/brmsWebs"/>
+            <param name="file.name" value="standalone.conf"/>
+            <param name="dest.dir" value="${jboss.home}/bin"/>
+        </antcall>
         <antcall target="refresh.jboss" >
             <param name="management.port" value="${brms.webs.management.port}"/>
             <param name="port.offset" value="${brms.webs.port.offset}"/>
             <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
             <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
         </antcall>
         <mkdir dir="${install.home}/lib" />
         <antcall target="distro.clean" />
@@ -417,9 +441,11 @@
     <target name="all" >
         <mkdir dir="${install.home}/lib" />
         <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
             <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>
         <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
         <antcall target="provision.switchyard.as7" />
