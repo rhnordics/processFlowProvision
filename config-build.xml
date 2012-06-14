@@ -117,9 +117,13 @@
     </target>
     <target name="eap.cli.gui" depends="" description="">
         <fail unless="management.port" message="eap.cli.gui:  need to pass 'management.port' property" />
+        <if>
+            <not><isset property="server.ip.address"/></not>
+            <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then>
+        </if>
         <exec spawn="true" executable="${jboss.home}/bin/jboss-cli.sh">
             <arg value="--connect"/>
-            <arg value="--controller=${ENV.HOSTNAME}:${management.port}"/>
+            <arg value="--controller=${server.ip.address}:${management.port}"/>
             <arg value="--gui"/>
         </exec>
     </target>
