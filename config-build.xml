@@ -119,6 +119,12 @@
             <not><isset property="cli.fail.on.error"/></not>
             <then><property name="cli.fail.on.error" value="true" /></then>
         </if>
+        <antcall target="filter">
+            <param name="source.dir" value="conf/jboss"/>
+            <param name="file.name" value="jboss-cli.sh"/>
+            <param name="dest.dir" value="${jboss.home}/bin"/>
+        </antcall>
+        <chmod file="${jboss.home}/bin/jboss-cli.sh" perm="755" />
         <echo message="***** execute.cli :  about to execute following batch script = ${temp.dir}/${cli.to.filter.and.execute} : cli.fail.on.error = ${cli.fail.on.error}" />
         <exec executable="${jboss.home}/bin/jboss-cli.sh" failonerror="${cli.fail.on.error}">
             <arg value="--connect"/>
@@ -133,6 +139,12 @@
             <not><isset property="server.ip.address"/></not>
             <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then>
         </if>
+        <antcall target="filter">
+            <param name="source.dir" value="conf/jboss"/>
+            <param name="file.name" value="jboss-cli.sh"/>
+            <param name="dest.dir" value="${jboss.home}/bin"/>
+        </antcall>
+        <chmod file="${jboss.home}/bin/jboss-cli.sh" perm="755" />
         <exec spawn="true" executable="${jboss.home}/bin/jboss-cli.sh">
             <arg value="--connect"/>
             <arg value="--controller=${server.ip.address}:${management.port}"/>
@@ -152,14 +164,14 @@
         <if>
             <isset property="file.name"/>
             <then>
-                <copy file="${source.dir}/${file.name}" toDir="${dest.dir}" overwrite="true">
+                <copy file="${source.dir}/${file.name}" toDir="${dest.dir}" overwrite="true" preservelastmodified="true">
                     <filterchain>
                         <expandproperties/>
                     </filterchain>
                 </copy>
             </then>
             <else>
-                <copy toDir="${dest.dir}" overwrite="true">
+                <copy toDir="${dest.dir}" overwrite="true" preservelastmodified="true">
                     <fileset dir="${source.dir}" />
                     <filterchain>
                         <expandproperties/>
