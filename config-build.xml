@@ -40,18 +40,6 @@
             <arg value="${port.offset}"/>
         </exec>
     </target>
-    <target name="bounce.pfp.core" description="">
-        <antcall target="stop.jboss" >
-            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
-            <param name="management.port" value="${pfp.core.management.port}"/>
-        </antcall>
-        <antcall target="start.jboss" >
-            <param name="port.offset" value="${pfp.core.port.offset}"/>
-            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
-            <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
-            <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
-        </antcall>
-    </target>
     <target name="refresh.jboss" >
         <fail unless="server.ip.address" message="refresh.jboss:  need to pass 'server.ip.address' property" />
         <fail unless="management.port" message="refresh.jboss:  need to pass 'management.port' property" />
@@ -189,7 +177,7 @@
 
  
 
-  <target name="provision.switchyard.as7" description="">
+  <target name="provision.switchyard.as7" >
     <delete dir="${jboss.home}" />
     <echo message="Getting switchyard ..." />
     <mkdir dir="${install.home}/lib"/>
@@ -240,7 +228,7 @@
         </antcall>
     </target>
 
-    <target name="pfp-config" description="">
+    <target name="pfp-config" >
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/pfp"/>
             <param name="cli.to.filter.and.execute" value="pfp-config-up.cli"/>
@@ -382,7 +370,7 @@
   </target>
 
     <!-- re-create guvnor filesystem and copy over repository.xml -->
-    <target name="refreshGuvnor" description="" >
+    <target name="refreshGuvnor" >
         <delete dir="${guvnor_repo_location}" />
         <mkdir dir="${guvnor_repo_location}" />
         <if>
