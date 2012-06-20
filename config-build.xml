@@ -6,7 +6,11 @@
     <!--- NOTE:  found in ant-contrib project
         - now using for the use of 'var' tasks in subprojects where MUTABLE properties would be nice
     -->
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="lib/ant/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
 
     <target name="stop.jboss" >
         <fail unless="management.port" message="stop.jboss:  need to pass 'management.port' property" />
