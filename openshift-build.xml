@@ -1,0 +1,60 @@
+<project name="pfp-openshift" >
+
+    <target name="provision.openshift.brms.webs" description="" >
+       <antcall target="os.refresh.jboss" >
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="management.port" value="${brms.webs.management.port}"/>
+            <param name="ssh.url" value="${brmsWebs.ssh.url}"/>
+        </antcall>
+        <mkdir dir="${install.home}/lib" />
+        <antcall target="distro.clean" />
+        <antcall target="download.jbpm5.artifacts" />
+        <antcall target="prepare.brms.webs" />
+        <antcall target="deploy.brms.webs" >
+            <param name="management.port" value="${brms.webs.management.port}"/>
+        </antcall>
+    </target>
+
+    <target name="os.refresh.jboss" >
+        <fail unless="server.ip.address" message="refresh.jboss:  need to pass 'server.ip.address' property" />
+        <fail unless="management.port" message="refresh.jboss:  need to pass 'management.port' property" />
+        <fail unless="ssh.url" message="refresh.jboss:  need to pass 'ssh.url' property" />
+        <echo message="***** refresh.jboss :  will now call the following target :  stop.jboss, start.jboss" />
+        <antcall target="os.stop.jboss" >
+            <param name="server.ip.address" value="${server.ip.address}"/>
+            <param name="management.port" value="${management.port}"/>
+            <param name="ssh.url" value="${ssh.url}"/>
+        </antcall>
+        <antcall target="os.start.jboss" >
+            <param name="ssh.url" value="${ssh.url}"/>
+        </antcall>
+    </target>
+
+    <target name="os.stop.jboss" >
+        <fail unless="management.port" message="stop.jboss:  need to pass 'management.port' property" />
+        <fail unless="ssh.url" message="stop.jboss:  need to pass 'ssh.url' property" />
+        <if>    
+            <not><isset property="server.ip.address"/></not>
+            <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then>
+        </if>   
+        <exec executable="bash" failonerror="true" dir="." >
+           <arg value="bin/openshift.sh"/>
+           <arg value="stopJboss"/>
+           <arg value="-localJbossHome=${jboss.home}"/>
+           <arg value="-serverIpAddr=${server.ip.address}"/>
+           <arg value="-managementPort=${management.port}"/>
+           <arg value="-sshUrl=${ssh.url}"/>
+        </exec> 
+    </target>
+
+
+    <target name="os.start.jboss" >
+        <fail unless="ssh.url" message="start.jboss:  need to pass 'ssh.url' property" />
+        <exec executable="bin/openshift.sh" failonerror="true" >
+            <arg value="startJboss"/>
+            <arg value="-sshUrl=${ssh.url}"/>
+        </exec> 
+    </target>
+
+
+</project>

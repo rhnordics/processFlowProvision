@@ -1,5 +1,6 @@
 <project name="processFlowProvision-distro" default="all" >
 
+    <import file="openshift-build.xml" />
     <property environment="ENV"/>
     <property file="build.properties" />
 
