@@ -4,8 +4,8 @@ batch
 run-batch
 
 #batch
-#deploy ${temp.dir}/${guvnor.name}
-#deploy ${temp.dir}/${designer.name}
-#deploy ${temp.dir}/${console.server.name}
-#deploy ${temp.dir}/${console.name}
+#deploy ${temp.deployments.dir}/${guvnor.name}
+#deploy ${temp.deployments.dir}/${designer.name}
+#deploy ${temp.deployments.dir}/${console.server.name}
+#deploy ${temp.deployments.dir}/${console.name}
 #run-batch
