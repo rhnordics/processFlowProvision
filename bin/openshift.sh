@@ -3,6 +3,7 @@
 command=$1
 socketIsOpen=2
 remoteJbossHome=jbossas-7/jbossas-7
+fileSize=0
 
 for var in $@
 do
@@ -19,6 +20,9 @@ do
         -sshUrl=*)
             sshUrl=`echo $var | cut -f2 -d\=`
             ;;
+        -fileToCopy=*)
+            fileToCopy=`echo $var | cut -f2 -d\=`
+            ;;
     esac
 done
 
@@ -28,10 +32,10 @@ done
 #echo "sshUrl = $sshUrl";
 
 stopJboss() {
-    checkPort
+    checkRemotePort
     if [ $socketIsOpen -ne 0 ]; then
         createTunnel
-        checkPort
+        checkRemotePort
         if [ $socketIsOpen -ne 0 ]; then
             echo -en "\n unable to create tunnel.  see previous errors"
             exit 1
@@ -45,7 +49,7 @@ stopJboss() {
 }
 
 # Test remote host:port availability (TCP-only as UDP does not reply)
-function checkPort() {
+function checkRemotePort() {
     (echo >/dev/tcp/$hostName/$cliPort) &>/dev/null
     if [ $? -eq 0 ]; then
         echo -en "\n$hostName:$cliPort is open."
@@ -53,6 +57,25 @@ function checkPort() {
     else
         echo -en "\n$hostName:$cliPort is closed."
         socketIsOpen=1
+    fi
+}
+
+#$1 = relative path (from ~/app-root directory) to remote file
+function getRemoteFileSize() {
+    ssh $sshUrl "
+        mkdir -p app-root/target/tmp
+        fileSize=$(ls -nl app-root/$1 | awk '{print $5}')
+    "
+    echo -ne "remote file size of $1 = $fileSize"
+}
+
+function copyArchiveToRemote() {
+    getRemoteFileSize fileToCopy
+    localFileSize=$(ls -nl $fileToCopy | awk '{print $5}')
+    if [ $fileSize -eq $localFileSize ]; then
+        echo -en "\nno need to copy $fileToCopy"
+    else
+        echo -en "\nupdate to $fileToCopy is needed.  local=$localFileSize : remote=$fileSize"
     fi
 }
 
@@ -79,10 +102,10 @@ startJboss() {
 
 
 case "$1" in
-    startJboss|stopJboss)
+    startJboss|stopJboss|copyArchiveToRemote)
         $1
         ;;
     *)
-    echo 1>&2 $"Usage: $0 {startJboss|stopJboss}"
+    echo 1>&2 $"Usage: $0 {startJboss|stopJboss|copyArchiveToRemote}"
     exit 1
 esac

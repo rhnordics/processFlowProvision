@@ -1,1 +1,3 @@
-integration of switchyard and integration layer of jbpm5 console
+integration of switchyard with integration layer of jbpm5 console
+openshift integration
+    - use rhc command to create required projects   :   rhc-create-app -a swydapp -t jbossas-7
