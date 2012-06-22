@@ -55,10 +55,18 @@
         <antcall target="clone.jboss" >
             <param name="new.server.configuration" value="${new.server.configuration}"/>
         </antcall>
+        <antcall target="configure.jboss.modules" />
         <antcall target="start.jboss" >
             <param name="port.offset" value="${port.offset}"/>
             <param name="new.server.configuration" value="${new.server.configuration}"/>
             <param name="server.ip.address" value="${server.ip.address}"/>
+        </antcall>
+        <antcall target="execute.cli">
+            <param name="cli.source.dir" value="conf/jboss"/>
+            <param name="cli.to.filter.and.execute" value="jboss-config-up.cli"/>
+            <param name="server.ip.address" value="${server.ip.address}"/>
+            <param name="management.port" value="${management.port}"/>
+            <param name="cli.fail.on.error" value="true"/>
         </antcall>
     </target>
     <target name="checkServersAndProjectLib">
@@ -82,6 +90,15 @@
         <copy overwrite="true" todir="${jboss.home}/${new.server.configuration}">
             <fileset dir="${jboss.home}/standalone-orig" />
         </copy>
+    </target>
+
+    <target name="configure.jboss.modules" >
+        <antcall target="filter">
+            <param name="source.dir" value="conf/jboss/modules"/>
+            <param name="dest.dir" value="${jboss.home}/modules"/>
+        </antcall>
+        <copy file="${postgresql.jdbc.lib.path}" todir="${jboss.home}/modules/org/postgresql/jdbc/main" />
+        <copy file="${mysql.jdbc.lib.path}" todir="${jboss.home}/modules/com/mysql/jdbc/main" />
     </target>
 
     <!--
