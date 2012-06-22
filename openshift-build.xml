@@ -10,8 +10,9 @@
         <antcall target="distro.clean" />
         <antcall target="download.jbpm5.artifacts" />
         <antcall target="prepare.brms.webs" />
-        <antcall target="deploy.brms.webs" >
-            <param name="management.port" value="${brms.webs.management.port}"/>
+        <antcall target="os.deploy.brms.webs" >
+            <param name="ssh.url" value="${brmsWebs.ssh.url}"/>
+            <param name="remote.deployments.dir" value="~/${brmsWebs.app.name}/repo/deployments/"/>
         </antcall>
     </target>
 
@@ -55,6 +56,20 @@
             <arg value="-sshUrl=${ssh.url}"/>
         </exec> 
     </target>
+
+    <target name="os.deploy.brms.webs" >
+        <fail unless="ssh.url" message="os.deploy.brms.webs:  need to pass 'ssh.url' property" />
+        <fail unless="remote.deployments.dir" message="os.deploy.brms.webs:  need to pass 'remote.deployments.dir' property" />
+        <antcall target="create.brms.webs" />
+        <exec executable="bash" failonerror="true" dir="." >
+           <arg value="bin/openshift.sh"/>
+           <arg value="copyDirToRemote"/>
+           <arg value="-sshUrl=${ssh.url}"/>
+           <arg value="-localDir=${temp.deployments.dir}"/>
+           <arg value="-remoteDir=${remote.deployments.dir}"/>
+        </exec> 
+    </target>
+
 
 
 </project>

@@ -23,6 +23,15 @@ do
         -fileToCopy=*)
             fileToCopy=`echo $var | cut -f2 -d\=`
             ;;
+        -appName=*)
+            apName=`echo $var | cut -f2 -d\=`
+            ;;
+        -localDir=*)
+            localDir=`echo $var | cut -f2 -d\=`
+            ;;
+        -remoteDir=*)
+            remoteDir=`echo $var | cut -f2 -d\=`
+            ;;
     esac
 done
 
@@ -69,14 +78,8 @@ function getRemoteFileSize() {
     echo -ne "remote file size of $1 = $fileSize"
 }
 
-function copyArchiveToRemote() {
-    getRemoteFileSize fileToCopy
-    localFileSize=$(ls -nl $fileToCopy | awk '{print $5}')
-    if [ $fileSize -eq $localFileSize ]; then
-        echo -en "\nno need to copy $fileToCopy"
-    else
-        echo -en "\nupdate to $fileToCopy is needed.  local=$localFileSize : remote=$fileSize"
-    fi
+function copyDirToRemote() {
+    rsync -avz $localDir/* $sshUrl:$remoteDir
 }
 
 function createTunnel() {
@@ -102,10 +105,10 @@ startJboss() {
 
 
 case "$1" in
-    startJboss|stopJboss|copyArchiveToRemote)
+    startJboss|stopJboss|copyDirToRemote)
         $1
         ;;
     *)
-    echo 1>&2 $"Usage: $0 {startJboss|stopJboss|copyArchiveToRemote}"
+    echo 1>&2 $"Usage: $0 {startJboss|stopJboss|copyDirToRemote}"
     exit 1
 esac

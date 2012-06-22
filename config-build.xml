@@ -349,10 +349,7 @@
 
     <target name="deploy.brms.webs" >
         <fail unless="management.port" message="deploy.brms.webs:  need to pass 'management.port' property" />
-        <jar jarfile="${temp.deployments.dir}/${guvnor.name}" basedir="${guvnor.target}" />
-        <jar jarfile="${temp.deployments.dir}/${designer.name}" basedir="${designer.target}" />
-        <jar jarfile="${temp.deployments.dir}/${console.server.name}" basedir="${console.server.target}" />
-        <jar jarfile="${temp.deployments.dir}/${console.name}" basedir="${console.target}" />
+        <antcall target="create.brms.webs" />
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/brmsWebs"/>
             <param name="cli.to.filter.and.execute" value="brmsWebs-config-up.cli"/>
@@ -360,6 +357,12 @@
             <param name="management.port" value="${management.port}"/>
             <param name="cli.fail.on.error" value="true"/>
         </antcall>
+    </target>
+    <target name="create.brms.webs" >
+        <jar jarfile="${temp.deployments.dir}/${guvnor.name}" basedir="${guvnor.target}" />
+        <jar jarfile="${temp.deployments.dir}/${designer.name}" basedir="${designer.target}" />
+        <!--jar jarfile="${temp.deployments.dir}/${console.server.name}" basedir="${console.server.target}" />
+        <jar jarfile="${temp.deployments.dir}/${console.name}" basedir="${console.target}" / -->
     </target>
 
 
