@@ -12,16 +12,22 @@ do
             localJbossHome=`echo $var | cut -f2 -d\=`
             ;;
         -serverIpAddr=*)
-            hostName=`echo $var | cut -f2 -d\=`
+            serverIpAddr=`echo $var | cut -f2 -d\=`
+            ;;
+        -user=*)
+            user=`echo $var | cut -f2 -d\=`
+            ;;
+        -password=*)
+            password=`echo $var | cut -f2 -d\=`
             ;;
         -managementPort=*)
-            cliPort=`echo $var | cut -f2 -d\=`
+            port=`echo $var | cut -f2 -d\=`
             ;;
         -sshUrl=*)
             sshUrl=`echo $var | cut -f2 -d\=`
             ;;
-        -fileToCopy=*)
-            fileToCopy=`echo $var | cut -f2 -d\=`
+        -file=*)
+            file=`echo $var | cut -f2 -d\=`
             ;;
         -appName=*)
             apName=`echo $var | cut -f2 -d\=`
@@ -36,8 +42,8 @@ do
 done
 
 #echo "localJbossHome = $localJbossHome";
-#echo "hostName = $hostName";
-#echo "cliPort = $cliPort";
+#echo "serverIpAddr = $serverIpAddr";
+#echo "port = $port";
 #echo "sshUrl = $sshUrl";
 
 stopJboss() {
@@ -53,38 +59,47 @@ stopJboss() {
 
     echo -en $"\nstopping jboss daemon using script at: $localJbossHome/bin/jboss-cli.sh \n"
     cd $localJbossHome
-    ./bin/jboss-cli.sh --connect --controller=$hostName:$cliPort --command=:shutdown
+    ./bin/jboss-cli.sh --connect --controller=$serverIpAddr:$port --command=:shutdown
     sleep 2
 }
 
 # Test remote host:port availability (TCP-only as UDP does not reply)
 function checkRemotePort() {
-    (echo >/dev/tcp/$hostName/$cliPort) &>/dev/null
+    (echo >/dev/tcp/$serverIpAddr/$port) &>/dev/null
     if [ $? -eq 0 ]; then
-        echo -en "\n$hostName:$cliPort is open."
+        echo -en "\n$serverIpAddr:$port is open."
         socketIsOpen=0
     else
-        echo -en "\n$hostName:$cliPort is closed."
+        echo -en "\n$serverIpAddr:$port is closed."
         socketIsOpen=1
     fi
 }
 
-#$1 = relative path (from ~/app-root directory) to remote file
 function getRemoteFileSize() {
-    ssh $sshUrl "
-        mkdir -p app-root/target/tmp
-        fileSize=$(ls -nl app-root/$1 | awk '{print $5}')
-    "
-    echo -ne "remote file size of $1 = $fileSize"
+    fileSize=$(ssh $sshUrl "
+        wc -c < $remoteDir/$file;
+    ")
+    echo -ne "remote file size of $file = $fileSize"
 }
 
-function copyDirToRemote() {
-    rsync -avz $localDir/* $sshUrl:$remoteDir
+function copyFileToRemote() {
+    getRemoteFileSize
+    localFileSize=$(ls -nl $localDir/$file | awk '{print $5}')
+    if [ $fileSize -eq $localFileSize ]; then
+        echo -en "\nno need to copy $file"
+    else
+        echo -en "\nupdate to $file is needed.  local=$localFileSize : remote=$fileSize"
+        ssh $sshUrl "
+            cd $remoteDir;
+            rm $file*;
+        "
+        scp $localDir/$file $sshUrl:$remoteDir
+    fi
 }
 
 function createTunnel() {
     echo -en "\nattempting to create ssh tunnel"
-    ssh -N -L $hostName:$cliPort:$hostName:$cliPort $sshUrl &
+    ssh -N -L $serverIpAddr:$port:$serverIpAddr:$port $sshUrl &
     #echo -en "createTunnel() response = $? "
     sleep 5
 }
@@ -103,12 +118,35 @@ startJboss() {
     "
 }
 
+executeMysqlScript() {
+    checkRemotePort
+    if [ $socketIsOpen -ne 0 ]; then
+        createTunnel
+        checkRemotePort
+        if [ $socketIsOpen -ne 0 ]; then
+            echo -en "\n unable to create tunnel.  see previous errors"
+            exit 1
+        fi
+    fi
+
+    mysql -u$user -p$password -h$serverIpAddr < $file
+}
+
+refreshGuvnor() {
+    ssh $sshUrl "
+        rm -rf $OPENSHIFT_DATA_DIR/guvnor;
+        mkdir $OPENSHIFT_DATA_DIR/guvnor;
+    "
+    echo -en "\nabout to copy target/tmp/repository.xml to $sshUrl:$remoteDir"
+    scp target/tmp/repository.xml $sshUrl:$remoteDir
+}
+
 
 case "$1" in
-    startJboss|stopJboss|copyDirToRemote)
+    startJboss|stopJboss|copyFileToRemote|executeMysqlScript|refreshGuvnor)
         $1
         ;;
     *)
-    echo 1>&2 $"Usage: $0 {startJboss|stopJboss|copyDirToRemote}"
+    echo 1>&2 $"Usage: $0 {startJboss|stopJboss|copyFileToRemote|executeMysqlScript|refreshGuvnor}"
     exit 1
 esac
