@@ -132,6 +132,27 @@ executeMysqlScript() {
     mysql -u$user -p$password -h$serverIpAddr < $file
 }
 
+executePostgresqlScript() {
+    checkRemotePort
+    if [ $socketIsOpen -ne 0 ]; then
+        createTunnel
+        checkRemotePort
+        if [ $socketIsOpen -ne 0 ]; then
+            echo -en "\n unable to create tunnel.  see previous errors"
+            exit 1
+        fi
+    fi
+
+    scp $localDir/$file $sshUrl:/$remoteDir
+    ssh $sshUrl "
+        createdb guvnor;
+        createdb jbpm;
+        createdb jbpm_bam;
+
+        psql -d postgres -f $remoteDir/$file
+    "
+}
+
 refreshGuvnor() {
     ssh $sshUrl "
         rm -rf $OPENSHIFT_DATA_DIR/guvnor;
@@ -143,10 +164,10 @@ refreshGuvnor() {
 
 
 case "$1" in
-    startJboss|stopJboss|copyFileToRemote|executeMysqlScript|refreshGuvnor)
+    startJboss|stopJboss|copyFileToRemote|executeMysqlScript|executePostgresqlScript|refreshGuvnor)
         $1
         ;;
     *)
-    echo 1>&2 $"Usage: $0 {startJboss|stopJboss|copyFileToRemote|executeMysqlScript|refreshGuvnor}"
+    echo 1>&2 $"Usage: $0 {startJboss|stopJboss|copyFileToRemote|executeMysqlScript|executePostgresqlScript|refreshGuvnor}"
     exit 1
 esac

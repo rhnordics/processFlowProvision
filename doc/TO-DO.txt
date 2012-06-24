@@ -2,4 +2,4 @@ integration of switchyard with integration layer of jbpm5 console
 openshift integration
     - use rhc command to create required projects   :   rhc-create-app -a swydapp -t jbossas-7
 
-postgresql-8.4 cannot be embedded in scalable app 'pfpDbScaling'. Allowed cartridges: mysql-5.1,mongodb-2.0,jenkins-client-1.4
+postgresql-8.4 cannot be embedded in scalable app 'brmsWebs.dbScaling'. Allowed cartridges: mysql-5.1,mongodb-2.0,jenkins-client-1.4
