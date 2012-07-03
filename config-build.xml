@@ -444,8 +444,16 @@
             <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
             <param name="server.config.file.with.no.suffix" value="standalone-full"/>
         </antcall>
-        <antcall target="download.jbpm5.artifacts" />
-        <antcall target="explode.brms.webs.into.core" />
+        <!--antcall target="download.jbpm5.artifacts" />
+        <antcall target="explode.brms.webs.into.core" / -->
+        <antcall target="execute.cli">
+            <param name="cli.source.dir" value="conf/jboss"/>
+            <param name="cli.to.filter.and.execute" value="jboss-config-up.cli"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
+            <param name="cli.fail.on.error" value="true"/>
+        </antcall>
+
         <antcall target="hornetq-config" />
         <antcall target="pfp-config" />
         <antcall target="qpid-config" />

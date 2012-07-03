@@ -1,12 +1,8 @@
-batch
-deploy ${jdbc.lib.path}
-run-batch
-
 ### datasources 
 batch
-/subsystem=datasources/data-source=jbpm-core-cp:add(jndi-name=java:/global/jbpm-core-cp,connection-url=${jbpm_connection_url},driver-class=${jbpm_driver_class},driver-name=${jdbc.lib},user-name=${jbpm_db_user},password=${jbpm_db_password},pool-name=jbpm-core_ds_pool,max-pool-size=50,min-pool-size=10)
+/subsystem=datasources/data-source=jbpm-core-cp:add(jndi-name=java:/global/jbpm-core-cp,connection-url=${jbpm_connection_url},driver-class=${jbpm_driver_class},driver-name=${jdbc.module.name},user-name=${jbpm_db_user},password=${jbpm_db_password},pool-name=jbpm-core_ds_pool,max-pool-size=50,min-pool-size=10)
 /subsystem=datasources/data-source=jbpm-core-cp:enable()
  
-/subsystem=datasources/data-source=jbpm-bam-cp:add(jndi-name=java:/global/jbpm-bam-cp,connection-url=${bam_connection_url},driver-class=${bam_driver_class},driver-name=${jdbc.lib},user-name=${bam_db_user},password=${bam_db_password},pool-name=jbpm-bam_ds_pool,max-pool-size=50,min-pool-size=10)
+/subsystem=datasources/data-source=jbpm-bam-cp:add(jndi-name=java:/global/jbpm-bam-cp,connection-url=${bam_connection_url},driver-class=${bam_driver_class},driver-name=${jdbc.module.name},user-name=${bam_db_user},password=${bam_db_password},pool-name=jbpm-bam_ds_pool,max-pool-size=50,min-pool-size=10)
 /subsystem=datasources/data-source=jbpm-bam-cp:enable()
 run-batch
