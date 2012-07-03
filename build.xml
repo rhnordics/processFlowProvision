@@ -16,6 +16,7 @@
 
         <copy file="config-build.xml" tofile="${temp.distro.dir}/build.xml" />
         <copy file="conf/pfp/build.properties" todir="${temp.distro.dir}" />
+        <copy file="openshift-build.xml" todir="${temp.distro.dir}" />
         <copy file="LICENSE.txt" todir="${temp.distro.dir}" />
 
         <zip destfile="${install.home}/${distro.file.name}.zip">
