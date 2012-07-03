@@ -303,6 +303,7 @@
 
     <target name="explode.brms.webs.into.core" if="guvnorServerIsSameAsJBPM" >
         <antcall target="prepare.brms.webs" />
+        <antcall target="refreshGuvnor" />
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
@@ -325,8 +326,6 @@
             <param name="file.name" value="jboss-web.xml"/>
             <param name="dest.dir" value="${guvnor.target}/WEB-INF"/>
         </antcall>
-
-        <antcall target="refreshGuvnor" />
 
         <!-- designer assumes guvnor is bound to localhost .... change this to reflect bind address of jboss server that guvnor is deployed on -->
         <antcall target="filter">
@@ -469,6 +468,7 @@
         <antcall target="distro.clean" />
         <antcall target="download.jbpm5.artifacts" />
         <antcall target="prepare.brms.webs" />
+        <antcall target="refreshGuvnor" />
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>
