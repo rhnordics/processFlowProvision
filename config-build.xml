@@ -41,34 +41,97 @@
             <arg value="${port.offset}"/>
         </exec>
     </target>
-    <target name="refresh.jboss" >
-        <fail unless="server.ip.address" message="refresh.jboss:  need to pass 'server.ip.address' property" />
-        <fail unless="management.port" message="refresh.jboss:  need to pass 'management.port' property" />
-        <fail unless="port.offset" message="refresh.jboss:  need to pass 'port.offset' property" />
-        <fail unless="new.server.configuration" message="refresh.jboss:  need to pass 'new.server.configuration' property" />
-        <fail unless="server.config.file.with.no.suffix" message="refresh.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
-        <echo message="***** refresh.jboss :  will now call the following target :  stop.jboss, refresh.jboss, and start.jboss" />
+
+    <!-- ############################################################################################################### -->
+    <target name="bounce.pfp.core" description="">
         <antcall target="stop.jboss" >
-            <param name="server.ip.address" value="${server.ip.address}"/>
-            <param name="management.port" value="${management.port}"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
         </antcall>
-        <antcall target="clone.jboss" >
-            <param name="new.server.configuration" value="${new.server.configuration}"/>
-        </antcall>
-        <antcall target="configure.jboss.modules" />
         <antcall target="start.jboss" >
-            <param name="port.offset" value="${port.offset}"/>
-            <param name="new.server.configuration" value="${new.server.configuration}"/>
-            <param name="server.ip.address" value="${server.ip.address}"/>
-        </antcall>
-        <antcall target="execute.cli">
-            <param name="cli.source.dir" value="conf/jboss"/>
-            <param name="cli.to.filter.and.execute" value="jboss-config-up.cli"/>
-            <param name="server.ip.address" value="${server.ip.address}"/>
-            <param name="management.port" value="${management.port}"/>
-            <param name="cli.fail.on.error" value="true"/>
+            <param name="port.offset" value="${pfp.core.port.offset}"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
+            <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
+            <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
         </antcall>
     </target>
+
+    <!-- ############################################################################################################### -->
+    <target name="bounce.pfp.brms" description="">
+        <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="management.port" value="${brms.webs.management.port}"/>
+        </antcall>
+        <antcall target="start.jboss" >
+            <param name="port.offset" value="${brms.webs.port.offset}"/>
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
+            <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
+        </antcall>
+    </target>
+
+    <!-- ############################################################################################################### -->
+    <target name="stop.core" description="">
+        <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
+        </antcall>
+    </target>
+
+    <!-- ############################################################################################################### -->
+    <target name="stop.brms" description="">
+        <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="management.port" value="${brms.webs.management.port}"/>
+        </antcall>
+    </target>
+
+    <!-- ############################################################################################################### -->
+    <target name="stop.all" description="">
+        <antcall target="stop.core"/>
+        <antcall target="stop.brms"/>
+    </target>
+
+    <!-- ############################################################################################################### -->
+    <target name="start.brms" description="">
+       <antcall target="start.jboss" >
+            <param name="port.offset" value="${brms.webs.port.offset}"/>
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
+            <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
+        </antcall>
+    </target>
+
+    <!-- ############################################################################################################### -->
+    <target name="start.core" description="">
+        <antcall target="start.jboss" >
+            <param name="port.offset" value="${pfp.core.port.offset}"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
+            <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
+            <param name="server.config.file.with.no.suffix" value="${pfp.core.config.file.with.no.suffix}"/>
+        </antcall>
+    </target>
+
+    <!-- ############################################################################################################### -->
+    <target name="start.all" description="">
+        <antcall target="start.brms"/>
+        <antcall target="waitstart" />
+        <antcall target="start.core"/>
+    </target>
+
+    <target name="waitstart" description="">
+        <echo message="-------------------------------------------------------------------------------------------------" />
+        <echo message="Sleeping fo 60 sec" />
+        <echo message="-------------------------------------------------------------------------------------------------" />
+        <sleep seconds="60" />
+   </target>
+
+    <!-- ############################################################################################################### -->
+    <target name="bounce.all" description="">
+        <antcall target="stop.all"/>
+        <antcall target="start.all"/>
+    </target>
+
     <target name="checkServersAndProjectLib">
         <available file="${jboss.home}/jboss-modules.jar" property="defaultServerExists" />
         <fail unless="defaultServerExists" message="${jboss.home}/jboss-modules.jar doesn't exist! .... please fix your $JBOSS_HOME environment variable!!" />
@@ -99,6 +162,25 @@
         </antcall>
         <copy file="${postgresql.jdbc.lib.path}" todir="${jboss.home}/modules/org/postgresql/jdbc/main" />
         <copy file="${mysql.jdbc.lib.path}" todir="${jboss.home}/modules/com/mysql/jdbc/main" />
+
+        <!-- due to drools class conflicts ... replace drools libraries in modules directory with those found in guvnor -->
+        <delete >
+            <fileset dir="${jboss.home}/modules/org/drools/main" >
+                <include name="drools-compiler*.jar" />
+                <include name="drools-core*.jar" />
+                <include name="knowledge-api*.jar" />
+                <include name="knowledge-internal*.jar" />
+            </fileset>
+        </delete>
+        <copy todir="${jboss.home}/modules/org/drools/main" >
+            <fileset dir="${guvnor.target}/WEB-INF/lib" >
+                <include name="drools-compiler-${version.drools-compiler}.jar" />
+                <include name="drools-core-${version.drools-core}.jar" />
+                <include name="knowledge-api-${version.knowledge-api}.jar" />
+                <include name="knowledge-internal-api-${version.knowledge-internal-api}.jar" />
+            </fileset>
+        </copy>
+        
     </target>
 
     <!--
@@ -460,22 +542,37 @@
     </target>
     <target name="provision.brms.webs" description="" >
         <antcall target="checkServersAndProjectLib" />
+        <mkdir dir="${install.home}/lib" />
+        <antcall target="distro.clean" />
+        <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="management.port" value="${brms.webs.management.port}"/>
+        </antcall>
+        <antcall target="download.jbpm5.artifacts" />
+        <antcall target="prepare.brms.webs" />
         <antcall target="filter">
             <param name="source.dir" value="conf/brmsWebs"/>
             <param name="file.name" value="standalone.conf"/>
             <param name="dest.dir" value="${jboss.home}/bin"/>
         </antcall>
-        <antcall target="refresh.jboss" >
-            <param name="management.port" value="${brms.webs.management.port}"/>
+        <antcall target="clone.jboss" >
+            <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
+        </antcall>
+        <antcall target="configure.jboss.modules" />
+        <antcall target="start.jboss" >
             <param name="port.offset" value="${brms.webs.port.offset}"/>
             <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
-            <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
             <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
         </antcall>
-        <mkdir dir="${install.home}/lib" />
-        <antcall target="distro.clean" />
-        <antcall target="download.jbpm5.artifacts" />
-        <antcall target="prepare.brms.webs" />
+        <antcall target="execute.cli">
+            <param name="cli.source.dir" value="conf/jboss"/>
+            <param name="cli.to.filter.and.execute" value="jboss-config-up.cli"/>
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="management.port" value="${brms.webs.management.port}"/>
+            <param name="cli.fail.on.error" value="true"/>
+        </antcall>
+
         <antcall target="refreshGuvnor" />
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${brms.webs.management.port}"/>
@@ -484,13 +581,15 @@
 
     <target name="all" >
         <mkdir dir="${install.home}/lib" />
-        <antcall target="stop.jboss" >
-            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
-            <param name="management.port" value="${brms.webs.management.port}"/>
-        </antcall>
+
+        <!-- need to delete all possible running servers prior to recreating jboss.home -->
         <antcall target="stop.jboss" >
             <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="management.port" value="${pfp.core.management.port}"/>
+        </antcall>
+        <antcall target="stop.jboss" >
+            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
+            <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>
         <antcall target="provision.switchyard.as7" />
         <antcall target="provision.brms.webs" />

@@ -30,11 +30,17 @@ start() {
 }
 
 stop() {
-    echo -en $"stopping jboss daemon: \n"
-    ./bin/jboss-cli.sh --connect --controller=$hostName:$cliPort --command=:shutdown
-    echo
-    rm nohup.out
-    sleep 2
+    (echo >/dev/tcp/$hostName/$cliPort) &>/dev/null
+    if [ $? -eq 0 ]; then
+        echo -en $"stopping jboss daemon: \n"
+        ./bin/jboss-cli.sh --connect --controller=$hostName:$cliPort --command=:shutdown
+        echo
+        rm nohup.out
+        sleep 2
+    else
+        echo -en "\n$hostName:$cliPort is closed."
+    fi
+
 }
 
 restart() {
