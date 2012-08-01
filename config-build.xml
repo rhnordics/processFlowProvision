@@ -499,6 +499,20 @@
         <delete dir="${install.home}/${guvnor.name}" />
         <delete dir="${install.home}/${designer.name}" />
     </target>
+    <target name="provision.jboss.with.jdbc" >
+        <if>
+            <equals arg1="${jdbc.module.name}" arg2="mysql" />
+            <then><property name="db.script" value="mysql-config-up.cli"/></then>
+            <else><property name="db.script" value="pgsql-config-up.cli"/></else>
+        </if>
+        <antcall target="execute.cli">
+            <param name="cli.source.dir" value="conf/jboss"/>
+            <param name="cli.to.filter.and.execute" value="${db.script}"/>
+            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
+            <param name="management.port" value="${pfp.core.management.port}"/>
+            <param name="cli.fail.on.error" value="true"/>
+        </antcall>
+    </target>
 
     <target name="provision.pfp.core" description="">
         <antcall target="checkServersAndProjectLib" />
@@ -526,19 +540,7 @@
             <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
             <param name="server.config.file.with.no.suffix" value="standalone-full"/>
         </antcall>
-        <if>
-            <equals arg1="${jdbc.module.name}" arg2="mysql" />
-            <then><property name="db.script" value="mysql-config-up.cli"/></then>
-            <else><property name="db.script" value="pgsql-config-up.cli"/></else>
-        </if>
-        <antcall target="execute.cli">
-            <param name="cli.source.dir" value="conf/jboss"/>
-            <param name="cli.to.filter.and.execute" value="${db.script}"/>
-            <param name="server.ip.address" value="${pfp.core.ip.address}"/>
-            <param name="management.port" value="${pfp.core.management.port}"/>
-            <param name="cli.fail.on.error" value="true"/>
-        </antcall>
-
+        <antcall target="provision.jboss.with.jdbc" />
         <antcall target="hornetq-config" />
         <antcall target="pfp-config" />
         <antcall target="qpid-config" />
@@ -568,14 +570,7 @@
             <param name="server.ip.address" value="${brms.webs.ip.address}"/>
             <param name="server.config.file.with.no.suffix" value="${brms.webs.config.file.with.no.suffix}"/>
         </antcall>
-        <antcall target="execute.cli">
-            <param name="cli.source.dir" value="conf/jboss"/>
-            <param name="cli.to.filter.and.execute" value="jboss-config-up.cli"/>
-            <param name="server.ip.address" value="${brms.webs.ip.address}"/>
-            <param name="management.port" value="${brms.webs.management.port}"/>
-            <param name="cli.fail.on.error" value="true"/>
-        </antcall>
-
+        <antcall target="provision.jboss.with.jdbc" />
         <antcall target="refreshGuvnor" />
         <antcall target="deploy.brms.webs" >
             <param name="management.port" value="${brms.webs.management.port}"/>
