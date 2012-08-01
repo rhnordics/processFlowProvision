@@ -136,7 +136,7 @@
         <available file="${jboss.home}/jboss-modules.jar" property="defaultServerExists" />
         <fail unless="defaultServerExists" message="${jboss.home}/jboss-modules.jar doesn't exist! .... please fix your $JBOSS_HOME environment variable!!" />
         <available file="${jboss.home}/standalone-orig/configuration/standalone.xml" property="standalone.orig.exists" />
-        <fail unless="defaultServerExists" message="${jboss.home}/standalone-orig/configuration/standalone.xml doesn't exist! " />
+        <fail unless="standalone.orig.exists" message="${jboss.home}/standalone-orig/configuration/standalone.xml doesn't exist! " />
         <condition property="projectLibNotExist">
             <not>
                 <available file="${project.lib}" />
@@ -526,11 +526,14 @@
             <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
             <param name="server.config.file.with.no.suffix" value="standalone-full"/>
         </antcall>
-        <!--antcall target="download.jbpm5.artifacts" />
-        <antcall target="explode.brms.webs.into.core" / -->
+        <if>
+            <equals arg1="${jdbc.module.name}" arg2="mysql" />
+            <then><property name="db.script" value="mysql-config-up.cli"/></then>
+            <else><property name="db.script" value="pgsql-config-up.cli"/></else>
+        </if>
         <antcall target="execute.cli">
             <param name="cli.source.dir" value="conf/jboss"/>
-            <param name="cli.to.filter.and.execute" value="jboss-config-up.cli"/>
+            <param name="cli.to.filter.and.execute" value="${db.script}"/>
             <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="management.port" value="${pfp.core.management.port}"/>
             <param name="cli.fail.on.error" value="true"/>
