@@ -126,13 +126,15 @@ INSTALL   :
 
                                 
      -- Apache Ant
-        -- this project requires Apache Ant v. 1.8.3 along with the ant-contrib library
+        - this project requires Apache Ant v. 1.8.3 along with the ant-contrib library
 
-        -- if Ant v. 1.8.3 is not already installed, download from the following : http://ant.apache.org/bindownload.cgi
+        - if Ant v. 1.8.3 is not already installed, download from the following : http://ant.apache.org/bindownload.cgi
 
-        -- upon completion of download, unzip apache-ant-1.8.3-bin.zip  to the '$JBOSS_PROJECTS/' directory
+        - upon completion of download, unzip apache-ant-1.8.3-bin.zip  to the '$JBOSS_PROJECTS/' directory
             (as jboss):
                 unzip $JBOSS_PROJECTS/downloads/apache-ant-1.8.3-bin.zip -d $JBOSS_PROJECTS/
+
+        - ant-contrib is already included in $PFP/lib/ant .... so nothing more to do in that regard
 
 
         -- network considerations for Apache Ant (optional if behind corporate firewall)
