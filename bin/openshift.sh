@@ -84,6 +84,7 @@ function getRemoteFileSize() {
 
 
 # what's the problem with using rsync 
+# rsync -avz <deployments directory> <ssh-key of your application>@<application url>:~<application name>/repo/deployments
 function copyFileToRemote() {
     getRemoteFileSize
     localFileSize=$(ls -nl $localDir/$file | awk '{print $5}')
