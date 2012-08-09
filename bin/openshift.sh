@@ -82,6 +82,8 @@ function getRemoteFileSize() {
     echo -ne "remote file size of $file = $fileSize"
 }
 
+
+# what's the problem with using rsync 
 function copyFileToRemote() {
     getRemoteFileSize
     localFileSize=$(ls -nl $localDir/$file | awk '{print $5}')
