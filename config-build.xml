@@ -172,15 +172,23 @@
                 <include name="knowledge-internal*.jar" />
             </fileset>
         </delete>
-        <copy todir="${jboss.home}/modules/org/drools/main" >
-            <fileset dir="${guvnor.target}/WEB-INF/lib" >
-                <include name="drools-compiler-${version.drools-compiler}.jar" />
-                <include name="drools-core-${version.drools-core}.jar" />
-                <include name="knowledge-api-${version.knowledge-api}.jar" />
-                <include name="knowledge-internal-api-${version.knowledge-internal-api}.jar" />
-            </fileset>
-        </copy>
-        
+
+        <path id="a.path"> <fileset dir="${guvnor.target}/WEB-INF/lib" > <include name="drools-compiler-*"/></fileset> </path>
+        <property name="aa.path" refid="a.path" />
+        <copy file="${aa.path}" tofile="${jboss.home}/modules/org/drools/main/drools-compiler-${version.drools-compiler}.jar" />
+
+        <path id="b.path"> <fileset dir="${guvnor.target}/WEB-INF/lib" > <include name="drools-core-*"/></fileset> </path>
+        <property name="bb.path" refid="b.path" />
+        <copy file="${bb.path}" tofile="${jboss.home}/modules/org/drools/main/drools-core-${version.drools-compiler}.jar" />
+
+        <path id="c.path"> <fileset dir="${guvnor.target}/WEB-INF/lib" > <include name="knowledge-api-*"/></fileset> </path>
+        <property name="cc.path" refid="c.path" />
+        <copy file="${cc.path}" tofile="${jboss.home}/modules/org/drools/main/knowledge-api-${version.drools-compiler}.jar" />
+
+        <path id="d.path"> <fileset dir="${guvnor.target}/WEB-INF/lib" > <include name="knowledge-internal-api-*"/></fileset> </path>
+        <property name="dd.path" refid="d.path" />
+        <copy file="${dd.path}" tofile="${jboss.home}/modules/org/drools/main/knowledge-internal-api-${version.drools-compiler}.jar" />
+
     </target>
 
     <!--

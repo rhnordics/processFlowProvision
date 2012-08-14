@@ -26,7 +26,7 @@ start() {
         nohup ./bin/standalone.sh -b=$hostName -bmanagement=$hostName --server-config=$serverConfig -Djboss.server.base.dir=$jbossServerBaseDir -Djboss.socket.binding.port-offset=$jbossSocketBindingPortOffset $JAVA_OPTS &
     fi
    
-     sleep 10 
+     sleep 15 
 }
 
 stop() {
