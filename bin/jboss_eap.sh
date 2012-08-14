@@ -13,6 +13,7 @@ export jbossSocketBindingPortOffset=$6
 # stop
 export cliPort=$4
 
+# better solution is to set and export JAVA_OPTS environment variable
 start() {
     echo -en $"Starting jboss daemon w/ following command line args: \n\tserver-config = $serverConfig\n\tjboss.server.base.dir = $jbossServerBaseDir \n\tjboss.socket.binding.port-offset = $jbossSocketBindingPortOffset \n\t"
     cd $JBOSS_HOME

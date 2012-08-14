@@ -528,6 +528,7 @@
     <target name="provision.pfp.core" description="">
         <antcall target="checkServersAndProjectLib" />
         <antcall target="distro.clean" />
+        <!-- better solution is to set and export JAVA_OPTS environment variable -->
         <antcall target="filter">
             <param name="source.dir" value="conf/pfp"/>
             <param name="file.name" value="standalone.conf"/>
@@ -569,6 +570,7 @@
         </antcall>
         <antcall target="download.jbpm5.artifacts" />
         <antcall target="prepare.brms.webs" />
+        <!-- better solution is to set and export JAVA_OPTS environment variable -->
         <antcall target="filter">
             <param name="source.dir" value="conf/brmsWebs"/>
             <param name="file.name" value="standalone.conf"/>
