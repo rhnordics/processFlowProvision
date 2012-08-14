@@ -160,8 +160,11 @@
             <param name="source.dir" value="conf/jboss/modules"/>
             <param name="dest.dir" value="${jboss.home}/modules"/>
         </antcall>
-        <copy file="${postgresql.jdbc.lib.path}" todir="${jboss.home}/modules/org/postgresql/jdbc/main" />
-        <copy file="${mysql.jdbc.lib.path}" todir="${jboss.home}/modules/com/mysql/jdbc/main" />
+        <if>
+            <equals arg1="${jdbc.module.name}" arg2="postgresql" />
+            <then><copy file="${postgresql.jdbc.lib.path}" todir="${jboss.home}/modules/org/postgresql/jdbc/main" /></then>
+            <else><copy file="${mysql.jdbc.lib.path}" todir="${jboss.home}/modules/com/mysql/jdbc/main" /></else>
+        </if>
 
         <!-- due to drools class conflicts ... replace drools libraries in modules directory with those found in guvnor -->
         <delete >

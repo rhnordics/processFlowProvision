@@ -21,7 +21,7 @@
 
         <zip destfile="${install.home}/${distro.file.name}.zip">
             <zipfileset dir="${temp.distro.dir}" prefix="${distro.name}" />
-            <zipfileset dir="bin" prefix="${distro.name}/bin" />
+            <zipfileset dir="bin" prefix="${distro.name}/bin" filemode="755" />
             <zipfileset dir="conf" prefix="${distro.name}/conf"/>
             <zipfileset dir="lib" prefix="${distro.name}/lib"/>
             <zipfileset dir="doc" prefix="${distro.name}/doc">
