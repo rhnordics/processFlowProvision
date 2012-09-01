@@ -388,10 +388,11 @@
         <antcall target="download.designer" />
         <unzip src="${install.home}/lib/jbpm-designer-${designer.version}.war" dest="${designer.target}" />
 
+        <!-- not supported until switchyard jbpm component implements bpm-console integration interface and proxies to switchyard services
         <antcall target="download.jBPM.gwt-console" />
         <unzip src="${install.home}/lib/jbpm-${console.server.version}-gwt-console.zip" dest="${temp.dir}" />
         <unzip src="${temp.dir}/jbpm-gwt-console-${console.server.version}.war" dest="${console.target}"/>
-        <unzip src="${temp.dir}/jbpm-gwt-console-server-${console.server.version}.war" dest="${console.server.target}"/>
+        <unzip src="${temp.dir}/jbpm-gwt-console-server-${console.server.version}.war" dest="${console.server.target}"/ -->
     </target>
 
     <target name="explode.brms.webs.into.core" if="guvnorServerIsSameAsJBPM" >
