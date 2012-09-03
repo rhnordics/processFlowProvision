@@ -459,16 +459,6 @@
     </target>
 
 
-    <target name="clean.jbpm.install" depends="">
-        <!-- JA Bride :  now deleting anything that is not previously downloaded -->
-        <delete >
-            <fileset dir="${install.home}/lib" >
-                <include name="jbpm*.*" />
-                <exclude name="jbpm*.zip" />
-            </fileset>
-        </delete>
-    </target>
-
   <!-- Install Eclipse plugins -->
   <target name="install.drools-eclipse.into.eclipse" description="">
     <get src="${drools.eclipse.url}" dest="${install.home}/lib/org.drools.updatesite-${drools.eclipse.version}-assembly.zip"  skipexisting="true" />
@@ -612,7 +602,6 @@
         <antcall target="provision.switchyard.as7" />
         <antcall target="provision.brms.webs" />
         <antcall target="provision.pfp.core" />
-        <antcall target="clean.jbpm.install" />
     </target>
 
 </project>
