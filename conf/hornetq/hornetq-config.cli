@@ -1,5 +1,8 @@
 batch
 /subsystem=messaging/hornetq-server=default/:write-attribute(name=message-counter-enabled,value=true)
+
+# JAAS checks will have already occured on remote hornetq clients.  no need for additional hornetq specific checks
+/subsystem=messaging/hornetq-server=default/:write-attribute(name=security-enabled,value=false)
  
 /subsystem=messaging/hornetq-server=default/:write-attribute(name=cluster-password,value=${hornetq.cluster.password})
 
