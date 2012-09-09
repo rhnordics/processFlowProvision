@@ -18,7 +18,7 @@
             <param name="management.port" value="${brms.webs.management.port}"/>
             <param name="ssh.url" value="${brmsWebs.ssh.url}"/>
         </antcall>
-        <antcall target="execute.cli">
+        <antcall target="cli.batch">
             <param name="cli.source.dir" value="conf/brmsWebs"/>
             <param name="cli.to.filter.and.execute" value="brmsWebs-config-up.cli"/>
             <param name="server.ip.address" value="${brms.webs.ip.address}"/>
