@@ -1,6 +1,6 @@
 <project name="processFlowProvision" default="all" >
 
-    <import file="config-build.xml" />
+    <import file="local-build.xml" />
     
     <target name="clean" description="" >
         <delete dir="${guvnor_repo_location}" />
@@ -14,7 +14,7 @@
         <property name="distro.file.name" value="processFlow-bin-${switchyard.as.target.name}" />
         <property name="distro.name" value="processFlowProvision" />
 
-        <copy file="config-build.xml" tofile="${temp.distro.dir}/build.xml" />
+        <copy file="local-build.xml" tofile="${temp.distro.dir}/build.xml" />
         <copy file="build.properties" todir="${temp.distro.dir}" />
         <copy file="openshift-build.xml" todir="${temp.distro.dir}" />
         <copy file="LICENSE.txt" todir="${temp.distro.dir}" />
