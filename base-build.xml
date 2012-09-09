@@ -6,6 +6,8 @@
             2)  development.base    :   absolute path to directory where this base-build.xml is found
     -->
 
+    <property file="${development.base}/build.properties" />
+
     <!-- now using for the use of 'var' tasks in subprojects where MUTABLE properties would be nice -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
         <classpath>
@@ -23,7 +25,6 @@
     </path>
 
     <target name="print.classpath" description="" >
-        <antcall target="set.classpath" />
         <pathconvert pathsep="${line.separator}|   |-- "
              property="echo.classpath"
              refid="classpath">
@@ -33,30 +34,32 @@
 
     <!--
         purpose:  compile java source and create jar archive
-          - filters and replaces all variables from files found in ${subproject.name}/src/main/resources  (recursively)
+          - filters and replaces all variables from files found in src/main/resources  (recursively)
           - places those filtered copies into root directory of jar archive
-        parameters to pass to this target:
+        usage
+          classpath 
+            - expects a path named 'classpath' to be previously set
+          parameters to pass to this target:
             1) jar.name
             2) subproject.path
     -->
     <target name="jar" >
         <fail unless="jar.name" message="jar:  need to pass 'jar.name' property" />
-        <antcall target="set.classpath" />
-        <mkdir dir="${subproject.build}/META-INF" />
-        <javac debug="true" srcdir="${subproject.name}/src/main/java" destdir="${subproject.build}" >
+        <mkdir dir="${build.dir}/META-INF" />
+        <javac debug="true" srcdir="src/main/java" destdir="${build.dir}" >
             <classpath refid="classpath" />
         </javac>
         <if>
-            <available file="${subproject.name}/src/main/resources" />
+            <available file="src/main/resources" />
             <then>
                 <antcall target="filter">
-                    <param name="source.dir" value="${subproject.name}/src/main/resources"/>
-                    <param name="dest.dir" value="${subproject.build}"/>
+                    <param name="source.dir" value="src/main/resources"/>
+                    <param name="dest.dir" value="${build.dir}"/>
                 </antcall>
             </then>
         </if>
-        <jar jarfile="${subproject.build}/${jar.name}.jar" >
-            <fileset dir="${subproject.build}" />
+        <jar jarfile="${build.dir}/${jar.name}.jar" >
+            <fileset dir="${build.dir}" />
             <manifest>
                 <attribute name="Built-By" value="${ENV.USER}"/>
                 <attribute name="Implementation-Vendor" value="${vendor.name}"/>
@@ -64,20 +67,30 @@
         </jar>
     </target>
 
+    <!--
+        purpose:  compile java source and create war archive
+          - filters and replaces all variables from files found in src/main/webapp  (recursively)
+          - places those filtered copies into root directory of war archive
+        usage
+          classpath 
+            - expects a path named 'classpath' to be previously set
+          parameters to pass to this target:
+            1) jar.name
+            2) subproject.path
+    -->
     <!-- 3 May 2012:  wars and jars can't have the same name in EAP6.  will add '-war' to name to all web archives to avoid possible name confliction -->
     <target name="war" >
         <fail unless="war.name" message="war:  need to pass 'war.name' property" />
-        <antcall target="set.classpath" />
-        <mkdir dir="${subproject.build}/webapp/WEB-INF/classes" />
+        <mkdir dir="${build.dir}/webapp/WEB-INF/classes" />
         <antcall target="filter">
-            <param name="source.dir" value="${subproject.name}/src/main/webapp"/>
-            <param name="dest.dir" value="${subproject.build}/webapp"/>
+            <param name="source.dir" value="src/main/webapp"/>
+            <param name="dest.dir" value="${build.dir}/webapp"/>
         </antcall>
-        <javac debug="true" srcdir="${subproject.name}/src/main/webapp/WEB-INF/classes" destdir="${subproject.build}/webapp/WEB-INF/classes" >
+        <javac debug="true" srcdir="src/main/webapp/WEB-INF/classes" destdir="${build.dir}/webapp/WEB-INF/classes" >
             <classpath refid="classpath" />
         </javac>
-        <jar jarfile="${subproject.build}/${war.name}.war" >
-            <fileset dir="${subproject.build}/webapp" />
+        <jar jarfile="${build.dir}/${war.name}.war" >
+            <fileset dir="${build.dir}/webapp" />
             <manifest>
                 <attribute name="Built-By" value="${ENV.USER}"/>
                 <attribute name="Implementation-Vendor" value="Wavechain inc."/>
