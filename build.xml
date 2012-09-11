@@ -432,7 +432,7 @@
             <param name="new.server.configuration" value="${pfp.core.server.configuration}"/>
         </antcall>
         <antcall target="filter">
-            <param name="source.dir" value="conf/jboss"/>
+            <param name="source.dir" value="conf/pfp"/>
             <param name="file.name" value="standalone-full.xml"/>
             <param name="dest.dir" value="${jboss.home}/${pfp.core.server.configuration}/configuration"/>
         </antcall>
