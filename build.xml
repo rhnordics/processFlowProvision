@@ -436,6 +436,7 @@
             <param name="file.name" value="standalone-full.xml"/>
             <param name="dest.dir" value="${jboss.home}/${pfp.core.server.configuration}/configuration"/>
         </antcall>
+        <antcall target="addUserRoleConfigs" />
         <antcall target="start.jboss" >
             <param name="port.offset" value="${pfp.core.port.offset}"/>
             <param name="server.ip.address" value="${pfp.core.ip.address}"/>
@@ -450,6 +451,13 @@
         <antcall target="pfp-config" />
         <antcall target="qpid-config" />
     </target>
+
+    <target name="addUserRoleConfigs" >
+        <copy file="conf/jboss/application-roles.properties" todir="${jboss.home}/${pfp.core.server.configuration}/configuration" verbose="true" overwrite="true" />
+        <copy file="conf/jboss/application-users.properties" todir="${jboss.home}/${pfp.core.server.configuration}/configuration" verbose="true" overwrite="true" />
+        <copy file="conf/jboss/mgmt-users.properties" todir="${jboss.home}/${pfp.core.server.configuration}/configuration" verbose="true" overwrite="true" />
+    </target>
+
     <target name="provision.brms.webs" description="" >
         <antcall target="checkServersAndProjectLib" />
         <mkdir dir="${install.home}/lib" />
@@ -469,7 +477,7 @@
         <antcall target="clone.jboss" >
             <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
         </antcall>
-        <antcall target="configure.jboss.modules" />
+        <antcall target="addUserRoleConfigs" />
         <antcall target="start.jboss" >
             <param name="port.offset" value="${brms.webs.port.offset}"/>
             <param name="new.server.configuration" value="${brms.webs.server.configuration}"/>
@@ -499,6 +507,7 @@
             <param name="management.port" value="${brms.webs.management.port}"/>
         </antcall>
         <antcall target="provision.switchyard.as7" />
+        <antcall target="configure.jboss.modules" />
         <antcall target="provision.brms.webs" />
         <antcall target="provision.pfp.core" />
     </target>
