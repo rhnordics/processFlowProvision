@@ -197,6 +197,16 @@ INSTALL   :
                 -- (as root)    service postgresql reload
 
 
+    - mysql server
+        - (as root)
+            yum install mysql-server mysql-jdbc
+            systemctl enable mysqld.service
+            systemctl restart mysqld.service
+            passwd mysql        (set password as:  mysql)
+        - (as jboss)
+            cat $PFP_HOME/conf/mysql/processFlowProvision.sql | mysql -u root -p mysql
+
+
 
  
 
