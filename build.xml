@@ -159,6 +159,8 @@
         </if>
 
         <!-- due to drools class conflicts ... replace drools libraries in modules directory with those found in guvnor -->
+        <antcall target="download.drools.guvnor" />
+        <unzip src="${install.home}/lib/guvnor-distribution-wars-${drools.guvnor.version}-jboss-as-7.0.war" dest="${guvnor.target}" />
         <delete >
             <fileset dir="${jboss.home}/modules/org/drools/main" >
                 <include name="drools-compiler*.jar" />
