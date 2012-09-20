@@ -5,4 +5,8 @@ batch
  
 /subsystem=datasources/data-source=jbpm-bam-cp:add(jndi-name=java:/global/jbpm-bam-cp,connection-url=${bam_connection_url},driver-class=${bam_driver_class},driver-name=${jdbc.module.name},user-name=${bam_db_user},password=${bam_db_password},pool-name=jbpm-bam_ds_pool,max-pool-size=50,min-pool-size=10)
 /subsystem=datasources/data-source=jbpm-bam-cp:enable()
+
+# trace level logging of org.switchyard.transform.TransformerRegistryLoader to view loaded transforms
+/subsystem=logging/logger=org.switchyard.transform.TransformerRegistryLoader/:add(category=org.switchyard.transform.TransformerRegistryLoader,level=TRACE,use-parent-handlers=true)
+
 run-batch
