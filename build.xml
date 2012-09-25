@@ -524,6 +524,7 @@
     <target name="distro" depends="" description="" >
         <property name="distro.file.name" value="processFlow-bin-${switchyard.as.target.name}" />
         <property name="distro.name" value="processFlowProvision" />
+        <mkdir dir="${temp.distro.dir}" />
 
         <copy file="build.xml" tofile="${temp.distro.dir}" />
         <copy file="build.properties" todir="${temp.distro.dir}" />
