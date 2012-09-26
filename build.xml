@@ -526,7 +526,8 @@
         <property name="distro.name" value="processFlowProvision" />
         <mkdir dir="${temp.distro.dir}" />
 
-        <copy file="build.xml" tofile="${temp.distro.dir}" />
+        <copy file="base-build.xml" todir="${temp.distro.dir}" />
+        <copy file="build.xml" todir="${temp.distro.dir}" />
         <copy file="build.properties" todir="${temp.distro.dir}" />
         <copy file="openshift-build.xml" todir="${temp.distro.dir}" />
         <copy file="LICENSE.txt" todir="${temp.distro.dir}" />
