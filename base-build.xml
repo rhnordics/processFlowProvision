@@ -110,7 +110,7 @@
     <target name="cli.command" depends="" >
         <fail unless="cli.command" message="cli.command:  need to pass 'cli.command' property" />
         <if><not><isset property="server.ip.address"/></not>
-        <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then></if>
+        <then><property name="server.ip.address" value="${os.hostname}" /></then></if>
         <if><not><isset property="management.port"/></not>
         <then><property name="management.port" value="9999" /></then></if>
         <if><not><isset property="cli.fail.on.error"/></not>
@@ -135,7 +135,7 @@
         <fail unless="cli.source.dir" message="cli.batch:  need to pass 'cli.source.dir' property" />
         <fail unless="cli.to.filter.and.execute" message="cli.batch:  need to pass 'cli.to.filter.and.execute' property" />
         <if><not><isset property="server.ip.address"/></not>
-        <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then></if>
+        <then><property name="server.ip.address" value="${os.hostname}" /></then></if>
         <if><not><isset property="management.port"/></not>
         <then><property name="management.port" value="9999" /></then></if>
         <if><not><isset property="cli.fail.on.error"/></not>
@@ -148,7 +148,7 @@
         <echo message="***** cli.batch :  about to execute following batch script = ${build.dir}/${cli.to.filter.and.execute} : cli.fail.on.error = ${cli.fail.on.error}" />
         <exec executable="${jboss.home}/bin/jboss-cli.sh" failonerror="${cli.fail.on.error}" >
             <arg value="--connect"/>
-            <arg value="--controller=${ENV.HOSTNAME}:${management.port}"/>
+            <arg value="--controller=${os.hostname}:${management.port}"/>
             <arg value="-c"/>
             <arg value="--file=${build.dir}/${cli.to.filter.and.execute}"/>
         </exec>
@@ -156,7 +156,7 @@
 
     <target name="eap.cli.gui" depends="" description="">
         <if><not><isset property="server.ip.address"/></not>
-        <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then></if>
+        <then><property name="server.ip.address" value="${os.hostname}" /></then></if>
         <if><not><isset property="management.port"/></not>
         <then><property name="management.port" value="9999" /></then></if>
         <exec spawn="true" executable="${jboss.home}/bin/jboss-cli.sh">

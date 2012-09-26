@@ -48,7 +48,7 @@
         <fail unless="ssh.url" message="stop.jboss:  need to pass 'ssh.url' property" />
         <if>    
             <not><isset property="server.ip.address"/></not>
-            <then><property name="server.ip.address" value="${ENV.HOSTNAME}" /></then>
+            <then><property name="server.ip.address" value="${os.hostname}" /></then>
         </if>   
         <exec executable="bash" failonerror="true" dir="." >
            <arg value="bin/openshift.sh"/>
