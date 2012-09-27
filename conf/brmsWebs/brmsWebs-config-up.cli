@@ -5,7 +5,7 @@ batch
 /subsystem=datasources/data-source=guvnor-cp:enable()
 run-batch
 
-#batch
-deploy ${temp.deployments.dir}/${guvnor.name} --name=jboss-brms.war
+batch
+deploy ${temp.deployments.dir}/${guvnor.name} --name=${guvnor.name}
 deploy ${temp.deployments.dir}/${designer.name} --name=designer.war
-#run-batch
+run-batch

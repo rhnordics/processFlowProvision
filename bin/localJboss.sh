@@ -106,15 +106,14 @@ executeAddUser() {
 
 executeCli() {
     echo -en "executeCliScript() "
-    cd $jbossHome
-    chmod 755 bin/*.sh
+    chmod 755 $jbossHome/bin/*.sh
 
     export JAVA_OPTS=-Xmx$jbossCliXmx
 
-    if [ "x$cliCommand" = "x" ]; then
-        ./bin/jboss-cli.sh --connect --controller=$hostName:$cliPort --command=$cliCommand
+    if [ "x$cliCommand" !=  "x" ]; then
+        $jbossHome/bin/jboss-cli.sh --connect --controller=$hostName:$cliPort --command=$cliCommand
     else
-        ./bin/jboss-cli.sh --connect --controller=$hostName:$cliPort -c --file=$cliFile
+        $jbossHome/bin/jboss-cli.sh --connect --controller=$hostName:$cliPort -c --file=$cliFile
     fi
 }
 
