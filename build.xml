@@ -12,11 +12,11 @@
             <then><property name="server.ip.address" value="${os.hostname}" /></then>
         </if>
         <exec executable="bash" failonerror="true" dir="." >
-           <arg value="bin/jboss_eap.sh"/>
+           <arg value="bin/localJboss.sh"/>
            <arg value="stop"/>
-           <arg value="${jboss.home}"/>
-           <arg value="${server.ip.address}"/>
-           <arg value="${management.port}"/>
+           <arg value="-jbossHome=${jboss.home}"/>
+           <arg value="-hostName=${server.ip.address}"/>
+           <arg value="-cliPort=${management.port}"/>
         </exec>
     </target>
     <target name="start.jboss" >
@@ -24,13 +24,13 @@
         <fail unless="port.offset" message="start.jboss:  need to pass 'port.offset' property" />
         <fail unless="new.server.configuration" message="start.jboss:  need to pass 'new.server.configuration' property" />
         <fail unless="server.config.file.with.no.suffix" message="start.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
-        <exec executable="bin/jboss_eap.sh" failonerror="true" >
+        <exec executable="bin/localJboss.sh" failonerror="true" >
             <arg value="start"/>
-            <arg value="${jboss.home}"/>
-            <arg value="${server.ip.address}"/>
-            <arg value="${server.config.file.with.no.suffix}.xml"/>
-            <arg value="${new.server.configuration}"/>
-            <arg value="${port.offset}"/>
+            <arg value="-jbossHome=${jboss.home}"/>
+            <arg value="-hostName=${server.ip.address}"/>
+            <arg value="-serverConfig=${server.config.file.with.no.suffix}.xml"/>
+            <arg value="-jbossServerBaseDir=${new.server.configuration}"/>
+            <arg value="-jbossSocketBindingPortOffset=${port.offset}"/>
         </exec>
     </target>
 
