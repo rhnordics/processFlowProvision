@@ -21,6 +21,9 @@ do
         -cliPort=*)
             cliPort=`echo $var | cut -f2 -d\=` 
             ;;
+        -cliFile=*)
+            cliFile=`echo $var | cut -f2 -d\=` 
+            ;;
         -node=*)
             node=`echo $var | cut -f2 -d\=` 
             ;;
@@ -41,6 +44,12 @@ do
             ;;
         -jbossSocketBindingPortOffset=*)
             jbossSocketBindingPortOffset=`echo $var | cut -f2 -d\=` 
+            ;;
+        -jbossCliXmx=*)
+            jbossCliXmx=`echo $var | cut -f2 -d\=` 
+            ;;
+        -cliCommand=*)
+            cliCommand=`echo $var | cut -f2 -d\=` 
             ;;
     esac
 done
@@ -95,16 +104,26 @@ executeAddUser() {
     #fi
 }
 
-executeScript() {
-    echo -en "executeScript() "
+executeCli() {
+    echo -en "executeCliScript() "
+    cd $jbossHome
+    chmod 755 bin/*.sh
+
+    export JAVA_OPTS=-Xmx$jbossCliXmx
+
+    if [ "x$cliCommand" = "x" ]; then
+        ./bin/jboss-cli.sh --connect --controller=$hostName:$cliPort --command=$cliCommand
+    else
+        ./bin/jboss-cli.sh --connect --controller=$hostName:$cliPort -c --file=$cliFile
+    fi
 }
 
 
 case "$1" in
-    start|stop|restart|executeAddUser)
+    start|stop|restart|executeCli)
         $1
         ;;
     *)
-    echo 1>&2 $"Usage: $0 {start|stop|restart|executeAddUser|executeScript}"
+    echo 1>&2 $"Usage: $0 {start|stop|restart|executeAddUser|executeCli}"
     exit 1
 esac

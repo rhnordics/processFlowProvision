@@ -247,6 +247,7 @@
             <param name="server.ip.address" value="${pfp.core.ip.address}"/>
             <param name="management.port" value="${pfp.core.management.port}"/>
             <param name="cli.fail.on.error" value="true"/>
+            <param name="jbossCliXmx" value="${jboss.cli.Xmx}"/>
         </antcall>
     </target>
 
@@ -350,6 +351,7 @@
             <param name="server.ip.address" value="${brms.webs.ip.address}"/>
             <param name="management.port" value="${management.port}"/>
             <param name="cli.fail.on.error" value="true"/>
+            <param name="jbossCliXmx" value="${jboss.cli.Xmx}"/>
         </antcall>
     </target>
     <target name="create.brms.webs" >
