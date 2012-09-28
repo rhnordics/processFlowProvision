@@ -158,7 +158,7 @@
             <else><copy file="${mysql.jdbc.lib.path}" todir="${jboss.home}/modules/com/mysql/jdbc/main" /></else>
         </if>
 
-        <!-- due to drools class conflicts ... replace drools libraries in modules directory with those found in guvnor -->
+        <!-- due to drools class conflicts ... replace drools libraries in modules directory with those found in guvnor
         <antcall target="download.drools.guvnor" />
         <unzip src="${install.home}/lib/guvnor-distribution-wars-${drools.guvnor.version}-jboss-as-7.0.war" dest="${guvnor.target}" />
         <delete >
@@ -184,7 +184,7 @@
 
         <path id="d.path"> <fileset dir="${guvnor.target}/WEB-INF/lib" > <include name="knowledge-internal-api-*"/></fileset> </path>
         <property name="dd.path" refid="d.path" />
-        <copy file="${dd.path}" tofile="${jboss.home}/modules/org/drools/main/knowledge-internal-api-${version.drools-compiler}.jar" />
+        <copy file="${dd.path}" tofile="${jboss.home}/modules/org/drools/main/knowledge-internal-api-${version.drools-compiler}.jar" / -->
 
     </target>
 
