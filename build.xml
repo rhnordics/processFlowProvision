@@ -12,7 +12,7 @@
             <then><property name="server.ip.address" value="${os.hostname}" /></then>
         </if>
         <exec executable="bash" failonerror="true" dir="." >
-           <arg value="bin/localJboss.sh"/>
+           <arg value="${development.base}/bin/localJboss.sh"/>
            <arg value="stop"/>
            <arg value="-jbossHome=${jboss.home}"/>
            <arg value="-hostName=${server.ip.address}"/>
@@ -24,7 +24,7 @@
         <fail unless="port.offset" message="start.jboss:  need to pass 'port.offset' property" />
         <fail unless="new.server.configuration" message="start.jboss:  need to pass 'new.server.configuration' property" />
         <fail unless="server.config.file.with.no.suffix" message="start.jboss:  need to pass 'server.config.file.with.no.suffix' property" />
-        <exec executable="bin/localJboss.sh" failonerror="true" >
+        <exec executable="${development.base}/bin/localJboss.sh" failonerror="true" >
             <arg value="start"/>
             <arg value="-jbossHome=${jboss.home}"/>
             <arg value="-hostName=${server.ip.address}"/>
