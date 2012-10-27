@@ -330,7 +330,7 @@
             <param name="dest.dir" value="${designer.target}/profiles"/>
         </antcall>
         <copy file="conf/brmsWebs/designer/WEB-INF/jboss-web.xml" toDir="${designer.target}/WEB-INF" />
-        <copy file="${jdbc.lib.path}" toDir="${guvnor.target}/WEB-INF/lib" />
+        <!--copy file="${jdbc.lib.path}" toDir="${guvnor.target}/WEB-INF/lib" / -->
 
         <!-- gwt-console configs -->
         <delete file="${console.server.target}/WEB-INF/classes/ChangeSet.xml" />
